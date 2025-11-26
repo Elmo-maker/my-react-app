@@ -125,9 +125,11 @@ export default function AboutUs() {
             <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">Tim Kami</h2>
             <div className="grid md:grid-cols-3 gap-8">
               {[
-                { name: "Budi Santoso", role: "CEO & Founder" },
-                { name: "Siti Nurhaliza", role: "CTO" },
-                { name: "Ahmad Wijaya", role: "Head of Marketing" },
+                { name: "Elmo Rafi Utomo", role: "CEO & Founder" },
+                { name: "Aditya Narayan", role: "CTO" },
+                { name: "Ahmad Ridho", role: "Head of Marketing" },
+                { name: "Raysa Ghaftan", role: "UI/UX" },
+                { name: "Zidan Yanuar", role: "Profesional Backend" },
               ].map((member, index) => (
                 <div key={index} className="bg-white p-6 rounded-lg shadow-md text-center">
                   <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
