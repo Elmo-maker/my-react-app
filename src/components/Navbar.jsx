@@ -1,58 +1,95 @@
 import { Link } from "react-router-dom";
-import LoginModal from "./LoginModal"; // import komponen login modal
+import { Search, Menu } from "lucide-react"; 
+import LoginModal from "./LoginModal"; 
+import { useState } from "react"; 
 
 export default function Navbar() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false); 
+
   return (
-    <nav className="bg-blue-500 shadow-md fixed top-0 left-0 w-full z-50">
-      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+    // Menggunakan latar belakang gelap semi-transparan, tanpa backdrop-blur (FIX untuk modal di tengah)
+    <nav className="fixed top-0 left-0 w-full z-50 bg-gray-950/90 border-b border-gray-800 shadow-xl">
+      <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
         
-        {/* Logo */}
-        <div className="flex items-center space-x-3">
-          <img
-            src="https://flowbite.com/docs/images/logo.svg"
-            alt="Logo"
-            className="h-7"
-          />
-          <span className="text-xl font-semibold text-gray-800">FESTIFY</span>
+        {/* Logo (Mengikuti Style Aesthetic) */}
+        <div className="flex items-center space-x-2">
+            <span className="text-3xl font-extrabold text-white">
+              Festify<span className="text-indigo-400">™</span>
+            </span>
         </div>
 
-        {/* Menu */}
-        <ul className="hidden md:flex space-x-8 text-gray-700 font-medium items-center">
-          <li><Link to="/" className="hover:text-blue-600">Home</Link></li>
-          <li><Link to="/about" className="hover:text-blue-600">About Us</Link></li>
-          <li><Link to="/contact" className="hover:text-blue-600">Contact Us</Link></li>
-          <li><Link to="/faq" className="hover:text-blue-600">FAQ</Link></li>
+        {/* Menu Utama (Desktop) */}
+        <ul className="hidden md:flex space-x-8 text-gray-300 font-medium items-center">
           <li>
-            {/* Login Modal */}
-            <LoginModal />
+            <Link to="/" className="hover:text-indigo-400 transition">
+              Home
+            </Link>
+          </li>
+          <li>
+            <Link to="/events" className="hover:text-indigo-400 transition">
+              Events
+            </Link>
+          </li>
+          <li>
+            <Link to="/about" className="hover:text-indigo-400 transition">
+              About Us
+            </Link>
+          </li>
+          <li>
+            <Link to="/contact" className="hover:text-indigo-400 transition">
+              Contact Us
+            </Link>
+          </li>
+          <li>
+            <Link to="/faq" className="hover:text-indigo-400 transition">
+              FAQ 
+            </Link> 
+            {/* Link FAQ dikembalikan */}
+          </li>
+          
+          {/* Search Icon (Minimalis) */}
+          <button className="text-gray-400 hover:text-white transition p-2">
+            <Search size={20} />
+          </button>
+
+          {/* Login Button/Modal */}
+          <li className="ml-4">
+            <LoginModal /> 
           </li>
         </ul>
 
-        {/* Search Bar */}
-        <div className="hidden md:block">
-          <form className="relative w-64">
-            <input
-              type="search"
-              placeholder="Search"
-              className="block w-full p-2 pl-9 text-sm border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            />
-            <svg
-              className="w-4 h-4 absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
+        {/* Tombol Mobile (Hamburger) */}
+        <div className="flex items-center md:hidden">
+            {/* Ikon Search untuk Mobile */}
+            <button className="text-gray-400 hover:text-white transition p-2 mr-2">
+                <Search size={20} />
+            </button>
+            {/* Hamburger Menu */}
+            <button 
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="text-white hover:text-indigo-400 p-2"
+                aria-label="Toggle menu"
             >
-              <path
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                d="m21 21-3.5-3.5M17 10a7 
-                7 0 1 1-14 0 7 7 0 0 1 14 0Z"
-              />
-            </svg>
-          </form>
+                <Menu size={24} />
+            </button>
         </div>
       </div>
+
+      {/* Dropdown Menu Mobile */}
+      {isMenuOpen && (
+        <div className="md:hidden bg-gray-950/95 shadow-lg border-t border-gray-800">
+            <ul className="flex flex-col space-y-3 p-4 text-gray-300 font-medium">
+                <li><Link to="/" className="block py-2 hover:text-indigo-400 transition" onClick={() => setIsMenuOpen(false)}>Home</Link></li>
+                <li><Link to="/events" className="block py-2 hover:text-indigo-400 transition" onClick={() => setIsMenuOpen(false)}>Events</Link></li>
+                <li><Link to="/about" className="block py-2 hover:text-indigo-400 transition" onClick={() => setIsMenuOpen(false)}>About Us</Link></li>
+                <li><Link to="/contact" className="block py-2 hover:text-indigo-400 transition" onClick={() => setIsMenuOpen(false)}>Contact Us</Link></li>
+                <li><Link to="/faq" className="block py-2 hover:text-indigo-400 transition" onClick={() => setIsMenuOpen(false)}>FAQ</Link></li>
+                <li className="pt-2">
+                    <LoginModal /> 
+                </li>
+            </ul>
+        </div>
+      )}
     </nav>
   );
 }
