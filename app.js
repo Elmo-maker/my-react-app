@@ -1,28 +1,20 @@
 const express = require('express');
 const app = express();
 
-const authRouter = require('./routes/login');
-const adminRouter = require('./routes/admin');
-const eventRouter = require('/.routes/even');
-const detailRouter = require('/.routers/detail');
-
 app.use(express.json());
 
+const loginRoutes = require('./routes/routes-login');
+const adminRoutes = require('./routes/routes-admin');
+const eventRoutes = require('./routes/routes-event');
+const detailRoutes = require('./routes/routes-tiket');
 
-app.use('/login', authRouter);
-app.use('/admin', adminRouter);
-app.use('/even', eventRouter);
-app.use('/detail', detailRouter);
 
-app.get('/', (req, res) => {
-  res.send('jalan kali');
-});
+app.use('/login', loginRoutes);
+app.use('/admin', adminRoutes);
+app.use('/event', eventRoutes);
+app.use('/tiket', detailRoutes);
 
-app.use((req, res) => {
-  res.status(404).json({ error: "Route tidak ditemukan" });
-});
 
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server berjalan di http://localhost:${PORT}`);
+app.listen(3000, () => {
+  console.log("Server berjalan pada port 3000");
 });

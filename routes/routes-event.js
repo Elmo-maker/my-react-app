@@ -1,13 +1,14 @@
 const express = require ('express');
-const router = express.router();
-const { hanyaadm } = require ('/../mdwr/adm');
+const router = express.Router();
+const  verifyuser = require ('../middleware/middleware-user')
+const { hanyaadm } = require ('../middleware/middleware-admin');
 
 const {
   createEvent,
   getEvents,
   updateEvent,
-  deleteEvent,
-} = require('../controller/event');
+  deleteEvent
+} = require('../controller/controller-event');
 
 router.post('/create', hanyaadm, createEvent)
 router.get('/event', hanyaadm, getEvents);

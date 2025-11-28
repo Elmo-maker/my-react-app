@@ -10,6 +10,7 @@ function hanyaadm(req, res, next) {
     if (decoded.role !== "admin") {
       return res.status(403).json({ error: "Akses hanya untuk admin" });
     }
+
     req.user = decoded;
     next();
   } catch (err) {
@@ -17,4 +18,4 @@ function hanyaadm(req, res, next) {
   }
 }
 
-module.exports = hanyaadm;
+module.exports = { hanyaadm };
