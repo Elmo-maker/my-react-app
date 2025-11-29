@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-function hanyaadmin(req, res, next) {
+function verifyToken(req, res, next) {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) return res.status(401).json({ error: "Token tidak ada" });
 
@@ -18,4 +18,4 @@ function hanyaadmin(req, res, next) {
   }
 }
 
-module.exports = { hanyaadmin };
+module.exports = { verifyToken };

@@ -12,6 +12,7 @@ const adminRoutes = require('./routes/routes-admin');
 const eventRoutes = require('./routes/routes-event');
 const detailRoutes = require('./routes/routes-tiket');
 const paymentRoutes = require('./routes/routes-payments');
+const transaksiRoutes = require('./routes/routes-transaksi');
 
 
 app.use('/login', loginRoutes);
@@ -19,6 +20,7 @@ app.use('/admin', adminRoutes);
 app.use('/event', eventRoutes);
 app.use('/tiket', detailRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/transaksi', transaksiRoutes);
 
 
 const PORT = process.env.port || 3000;
