@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
-const {hanyaadm} = require('../middleware/middleware-admin'); 
+const {hanyaadmin} = require('../middleware/middleware-admin'); 
 
 const { getDashboard } = require('../controller/controller-admin');
 
-router.get('/dashboard',hanyaadm, getDashboard);
+router.get('/dashboard',hanyaadmin, getDashboard);
 
 module.exports = router;

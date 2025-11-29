@@ -1,7 +1,7 @@
 const express = require ('express');
 const router = express.Router();
 const  verifyuser = require ('../middleware/middleware-user')
-const { hanyaadm } = require ('../middleware/middleware-admin');
+const { hanyaadmin } = require ('../middleware/middleware-admin');
 
 const {
   createEvent,
@@ -10,9 +10,9 @@ const {
   deleteEvent
 } = require('../controller/controller-event');
 
-router.post('/create', hanyaadm, createEvent)
-router.get('/event', hanyaadm, getEvents);
-router.put('/event/:id', hanyaadm, updateEvent);
-router.delete('/event/:id', hanyaadm, deleteEvent);
+router.post('/create', hanyaadmin, createEvent)
+router.get('/event', hanyaadmin, getEvents);
+router.put('/event/:id', hanyaadmin, updateEvent);
+router.delete('/event/:id', hanyaadmin, deleteEvent);
 
 module.exports = router;

@@ -1,7 +1,7 @@
 const express = require ('express');
 const router = express.Router();
 const verifyuser = require ('../middleware/middleware-user')
-const { hanyaadm } = require ('../middleware/middleware-admin');
+const { hanyaadmin } = require ('../middleware/middleware-admin');
 
 const {
   createTiket,
@@ -10,9 +10,9 @@ const {
   deleteTiket
 } = require('../controller/controller-tiket');
 
-router.post('/', verifyuser, hanyaadm, createTiket)
-router.get('/:id_event', hanyaadm, getDetailTiket);
-router.put('/:id', hanyaadm, updateTiket);
-router.delete('/:id', hanyaadm, deleteTiket);
+router.post('/', verifyuser, hanyaadmin, createTiket)
+router.get('/:id_event', hanyaadmin, getDetailTiket);
+router.put('/:id', hanyaadmin, updateTiket);
+router.delete('/:id', hanyaadmin, deleteTiket);
 
 module.exports = router;
