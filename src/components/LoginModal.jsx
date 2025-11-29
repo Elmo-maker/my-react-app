@@ -1,50 +1,93 @@
 import { useState, useEffect } from "react";
-import { Mail, X, Loader2 } from "lucide-react"; // Menambahkan Loader2 untuk ikon memuat
+import { Mail, Lock, X, Loader2 } from "lucide-react";
 
 export default function LoginModal() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [regEmail, setRegEmail] = useState("");
+  const [regPassword, setRegPassword] = useState("");
+  const [regConfirm, setRegConfirm] = useState("");
+
   const [isLoading, setIsLoading] = useState(false);
 
-  // Hook untuk menutup modal dengan tombol ESC
+  // ESC close
   useEffect(() => {
     const handleEscape = (event) => {
       if (event.key === "Escape") {
         setIsOpen(false);
+        setIsRegisterOpen(false);
       }
     };
-    if (isOpen) {
-      document.addEventListener("keydown", handleEscape);
-    }
-    return () => {
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, [isOpen]);
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, []);
 
-  const handleSubmit = async (e) => {
+  // ---- HANDLE LOGIN ----
+  const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // Simulasi fetch request. Ganti dengan endpoint Anda yang sebenarnya.
       const res = await fetch("http://localhost:5000/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert(`Login berhasil: ${data.message}`);
+        setIsOpen(false);
+        setEmail("");
+        setPassword("");
+      } else {
+        alert(`Login gagal: ${data.message}`);
+      }
+    } catch (err) {
+      alert("Server error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // ---- HANDLE REGISTER ----
+  const handleRegister = async (e) => {
+    e.preventDefault();
+
+    if (regPassword !== regConfirm) {
+      alert("Password tidak sama.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const res = await fetch("http://localhost:5000/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: regEmail, password: regPassword }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        alert(`Login berhasil: ${data.message}`);
-        setIsOpen(false);
-        setEmail("");
+        alert("Register berhasil! Silakan login.");
+        setIsRegisterOpen(false);
+        setIsOpen(true);
+
+        setRegEmail("");
+        setRegPassword("");
+        setRegConfirm("");
+
       } else {
-        alert(`Login gagal: ${data.message}`);
+        alert(`Gagal register: ${data.message}`);
       }
     } catch (err) {
-      console.error(err);
-      alert("Error server. Silakan coba lagi nanti.");
+      alert("Error server");
     } finally {
       setIsLoading(false);
     }
@@ -52,80 +95,212 @@ export default function LoginModal() {
 
   return (
     <>
+      {/* BUTTON UTAMA */}
       <button
         onClick={() => setIsOpen(true)}
-        // Tombol utama di luar modal dengan gaya premium
         className="bg-gray-900 text-amber-300 px-7 py-3 rounded-xl shadow-2xl shadow-gray-900/50 
-                   border border-amber-300/30 hover:bg-gray-800 transition duration-300 font-medium tracking-wider"
+                   border border-amber-300/30 hover:bg-gray-800 transition duration-300 tracking-wider"
       >
         Login
       </button>
 
+      {/* ================= LOGIN MODAL ================= */}
       {isOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
-          <div className="bg-black/30 backdrop-blur-xl border border-white/10
-                          rounded-2xl shadow-2xl shadow-black/80 w-full max-w-sm p-8 relative transform transition duration-300 ease-out">
-            
-            {/* Close button */}
+          <div className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl w-full max-w-sm p-8 relative">
+
+            {/* CLOSE BTN */}
             <button
               onClick={() => setIsOpen(false)}
-              className="absolute top-4 right-4 text-white/50 hover:text-amber-300 transition p-1 rounded-full"
-              aria-label="Tutup Modal"
+              className="absolute top-4 right-4 text-white/50 hover:text-amber-300 transition"
             >
               <X size={20} />
             </button>
 
-            {/* Title */}
-            <h2 className="text-4xl font-light text-white text-center mb-1 tracking-wide">
-              Selamat Datang
-            </h2>
+            {/* TITLE */}
+            <h2 className="text-4xl font-light text-white text-center mb-1">Selamat Datang</h2>
             <p className="text-center text-white/60 text-sm mb-10">
-              Silakan masukkan email Anda untuk melanjutkan.
+              Silakan masuk untuk melanjutkan.
             </p>
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="relative">
-                <label htmlFor="email-input" className="block text-white/70 mb-2 text-sm font-light">
-                    ALAMAT EMAIL
-                </label>
-                <div className="flex items-center gap-3 bg-black/20 border border-white/20 rounded-lg px-4 py-3
-                                focus-within:border-amber-300 transition duration-300">
+            {/* FORM LOGIN */}
+            <form onSubmit={handleLogin} className="space-y-6">
+
+              {/* EMAIL */}
+              <div>
+                <label className="text-white/70 mb-2 text-sm block">EMAIL</label>
+                <div className="flex items-center gap-3 bg-black/20 border border-white/20 rounded-lg px-4 py-3">
                   <Mail className="text-amber-300" size={20} />
                   <input
-                    id="email-input"
                     type="email"
                     required
-                    placeholder="nama.anda@domain.com"
+                    placeholder="nama@domain.com"
+                    className="bg-transparent text-white w-full focus:outline-none"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-transparent text-white placeholder-white/50 focus:outline-none text-base font-light"
                     disabled={isLoading}
                   />
                 </div>
               </div>
 
+              {/* PASSWORD */}
+              <div>
+                <label className="text-white/70 mb-2 text-sm block">PASSWORD</label>
+                <div className="flex items-center gap-3 bg-black/20 border border-white/20 rounded-lg px-4 py-3">
+                  <Lock className="text-amber-300" size={20} />
+                  <input
+                    type="password"
+                    required
+                    placeholder="••••••••"
+                    className="bg-transparent text-white w-full focus:outline-none"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+
+              {/* LOGIN BUTTON */}
               <button
                 type="submit"
                 disabled={isLoading}
-                // Tombol Submit dengan border/accent Emas
                 className={`w-full py-3.5 rounded-lg font-semibold text-lg tracking-wider
-                           ${isLoading 
-                              ? 'bg-gray-700 text-white/50 cursor-not-allowed' 
-                              : 'bg-gray-800 text-amber-300 border border-amber-300/60 hover:bg-amber-300 hover:text-gray-900 shadow-xl shadow-amber-300/10 transition duration-300'}`
-                           }
+                  ${
+                    isLoading
+                      ? "bg-gray-700 text-white/50 cursor-not-allowed"
+                      : "bg-gray-800 text-amber-300 border border-amber-300/60 hover:bg-amber-300 hover:text-gray-900 transition"
+                  }`}
               >
                 {isLoading ? (
-                    <span className="flex items-center justify-center">
-                        <Loader2 className="animate-spin mr-2" size={20} /> Memuat...
-                    </span>
-                ) : 'LANJUTKAN'}
+                  <span className="flex items-center justify-center">
+                    <Loader2 className="animate-spin mr-2" size={20} /> Memuat...
+                  </span>
+                ) : (
+                  "MASUK"
+                )}
               </button>
-            </form>
 
-            <p className="text-center text-white/40 text-xs mt-8 font-light">
-              © {new Date().getFullYear()} Aplikasi Premium Anda.
+              {/* REGISTER LINK */}
+              <p className="text-white/60 text-sm text-center mt-4">
+                Belum punya akun?{" "}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsOpen(false);
+                    setIsRegisterOpen(true);
+                  }}
+                  className="text-amber-300 hover:underline"
+                >
+                  Register
+                </button>
+              </p>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ================= REGISTER MODAL ================= */}
+      {isRegisterOpen && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl w-full max-w-sm p-8 relative">
+
+            {/* CLOSE */}
+            <button
+              onClick={() => setIsRegisterOpen(false)}
+              className="absolute top-4 right-4 text-white/50 hover:text-amber-300 transition"
+            >
+              <X size={20} />
+            </button>
+
+            <h2 className="text-4xl font-light text-white text-center mb-1">Register</h2>
+            <p className="text-center text-white/60 text-sm mb-10">
+              Buat akun untuk mulai menggunakan aplikasi.
             </p>
+
+            <form onSubmit={handleRegister} className="space-y-6">
+
+              {/* EMAIL */}
+              <div>
+                <label className="text-white/70 mb-2 text-sm block">EMAIL</label>
+                <div className="flex items-center gap-3 bg-black/20 border border-white/20 rounded-lg px-4 py-3">
+                  <Mail className="text-amber-300" size={20} />
+                  <input
+                    type="email"
+                    required
+                    placeholder="nama@domain.com"
+                    className="bg-transparent text-white w-full focus:outline-none"
+                    value={regEmail}
+                    onChange={(e) => setRegEmail(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* PASSWORD */}
+              <div>
+                <label className="text-white/70 mb-2 text-sm block">PASSWORD</label>
+                <div className="flex items-center gap-3 bg-black/20 border border-white/20 rounded-lg px-4 py-3">
+                  <Lock className="text-amber-300" size={20} />
+                  <input
+                    type="password"
+                    required
+                    placeholder="••••••••"
+                    className="bg-transparent text-white w-full focus:outline-none"
+                    value={regPassword}
+                    onChange={(e) => setRegPassword(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* CONFIRM PASSWORD */}
+              <div>
+                <label className="text-white/70 mb-2 text-sm block">KONFIRMASI PASSWORD</label>
+                <div className="flex items-center gap-3 bg-black/20 border border-white/20 rounded-lg px-4 py-3">
+                  <Lock className="text-amber-300" size={20} />
+                  <input
+                    type="password"
+                    required
+                    placeholder="••••••••"
+                    className="bg-transparent text-white w-full focus:outline-none"
+                    value={regConfirm}
+                    onChange={(e) => setRegConfirm(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* REGISTER BUTTON */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={`w-full py-3.5 rounded-lg font-semibold text-lg tracking-wider
+                  ${
+                    isLoading
+                      ? "bg-gray-700 text-white/50 cursor-not-allowed"
+                      : "bg-gray-800 text-amber-300 border border-amber-300/60 hover:bg-amber-300 hover:text-gray-900 transition"
+                  }`}
+              >
+                {isLoading ? (
+                  <span className="flex items-center justify-center">
+                    <Loader2 className="animate-spin mr-2" size={20} /> Memuat...
+                  </span>
+                ) : (
+                  "DAFTAR"
+                )}
+              </button>
+
+              <p className="text-white/60 text-sm text-center mt-4">
+                Sudah punya akun?{" "}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsRegisterOpen(false);
+                    setIsOpen(true);
+                  }}
+                  className="text-amber-300 hover:underline"
+                >
+                  Login
+                </button>
+              </p>
+            </form>
           </div>
         </div>
       )}
