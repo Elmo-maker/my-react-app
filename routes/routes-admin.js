@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
 
-const {hanyaadmin} = require('../middleware/middleware-admin'); 
+const verifyuser = require('../middleware/middleware-user')
+const {verifyToken} = require('../middleware/middleware-admin'); 
 
 const { getDashboard } = require('../controller/controller-admin');
 
-router.get('/dashboard',hanyaadmin, getDashboard);
+router.get('/dashboard',verifyToken,verifyuser, getDashboard);
 
 module.exports = router;

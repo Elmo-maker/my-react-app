@@ -24,10 +24,10 @@ exports.createEvent = async (req, res) => {
   }
 };
 
-
+//
 exports.getEvents = async (req, res) => {
   try {
-    const event = await prisma.event.findMany();
+    const event = await prisma.event_tiket.findMany();
     res.json(event);
   } catch (err) {
     res.status(500).json({ error: err.message });

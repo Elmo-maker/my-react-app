@@ -19,6 +19,7 @@ model login {
   password String
   email    String
   role     String @default("user")
+  transaksi transaksi[]
 }
 
 model event_tiket {
@@ -35,4 +36,16 @@ model detail_tiket {
   harga_tiket Int
   eventId     Int
   event       event_tiket @relation(fields: [eventId], references: [id_event])
+  transaksi   transaksi[]
+}
+
+model transaksi {
+  id_transaksi Int @id @default(autoincrement())
+  loginId      Int
+  tiketId      Int
+  jumlah       Int
+  total_harga  Int
+  tanggal_transaksi DateTime @default(now())
+  user   login        @relation(fields: [loginId], references: [id_login])
+  tiket  detail_tiket @relation(fields: [tiketId], references: [id_tiket])
 }
