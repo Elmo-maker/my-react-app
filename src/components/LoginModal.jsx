@@ -28,7 +28,7 @@ export default function LoginModal() {
     script.onload = () => {
         if (window.google) {
             window.google.accounts.id.initialize({
-                client_id: GOOGLE_CLIENT_ID,
+                client_id: GOOGLE_CLIENT_ID, //INI DIT
                 callback: handleCredentialResponse, // Tautkan ke fungsi handler
             });
             // Render tombol hanya ketika modal Login terbuka
