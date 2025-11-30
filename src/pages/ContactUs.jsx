@@ -39,9 +39,9 @@ export default function ContactUs() {
               
               <Mail size={48} className="text-indigo-400 mx-auto mb-4" />
               <h2 className="text-2xl font-bold mb-2 text-white">Email Support</h2>
-              <p className="text-gray-400 mb-4 font-light">elmorafiutomo@gmail.com</p>
+              <p className="text-gray-400 mb-4 font-light">officialfestify@gmail.com</p>
               <a
-                href="mailto:elmorafiutomo@gmail.com" 
+                href="mailto:officialfestify@gmail.com" 
                   /* Pastikan menggunakan 'mailto:' untuk membuka email client */
                 className="inline-flex items-center space-x-2 text-indigo-400 font-semibold mt-4 hover:text-indigo-300 transition"
               >
