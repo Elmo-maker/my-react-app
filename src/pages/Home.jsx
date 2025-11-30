@@ -7,21 +7,14 @@ export default function Home() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Ambil token dari localStorage setelah login
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setError("Anda belum login");
-      setLoading(false);
-      return;
-    }
-
+    // 🛑 LOGIKA TOKEN DIHAPUS - Akses Publik
+    
     fetch("http://localhost:3000/event", {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}` // pakai token
-      }
+      // 🛑 HEADER AUTHORIZATION DIHAPUS
+      headers: { "Content-Type": "application/json" } 
     })
       .then((res) => {
+        // Jika server mengembalikan status 404, 500, dll.
         if (!res.ok) throw new Error(`Gagal fetch event: ${res.status}`);
         return res.json();
       })
@@ -31,10 +24,11 @@ export default function Home() {
       })
       .catch((err) => {
         console.error(err);
-        setError(err.message);
+        // Menampilkan pesan error fetch
+        setError(err.message); 
         setLoading(false);
       });
-  }, []);
+  }, []); // Dependensi array kosong agar hanya berjalan sekali
 
   if (loading)
     return <p className="text-white text-center pt-32">Loading...</p>;
@@ -50,6 +44,7 @@ export default function Home() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
           {events.map((event) => (
+            // Pastikan event.id_event cocok dengan primary key dari Prisma
             <EventCard key={event.id_event} event={event} />
           ))}
         </div>
