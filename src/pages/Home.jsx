@@ -7,10 +7,10 @@ export default function Home() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // 🛑 LOGIKA TOKEN DIHAPUS - Akses Publik
+    // LOGIKA TOKEN DIHAPUS - Akses Publik
     
     fetch("http://localhost:3000/event", {
-      // 🛑 HEADER AUTHORIZATION DIHAPUS
+      // HEADER AUTHORIZATION DIHAPUS
       headers: { "Content-Type": "application/json" } 
     })
       .then((res) => {
