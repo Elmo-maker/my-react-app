@@ -1,183 +1,82 @@
-import React, { useState } from 'react';
-import Swal from 'sweetalert2';
+// src/pages/admin/events/CreateEvent.jsx  ← GANTI YANG INI SAJA
+import { useNavigate } from "react-router-dom";
 
-const CreateEvent = ({ onAddEvent }) => {
-  const [eventData, setEventData] = useState({
-    name: '',
-    date: '',
-    description: '',
-    price: ''
-  });
 
-  const handleChange = (e) => {
-    setEventData({
-      ...eventData,
-      [e.target.name]: e.target.value 
-    });
-  };
 
-  const handleSubmit = (e) => {
+export default function CreateEvent() {
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    const formData = new FormData(e.target);
     
-    if (!eventData.name || !eventData.date || !eventData.price) {
-      alert('Harap isi semua field yang wajib!');
-      return;
+    // PAKSA KIRIM SEMUA FIELD YANG DIBUTUHKAN CONTROLLER
+    const payload = {
+      nama_event: formData.get("nama_event"),
+      tanggal_event: formData.get("tanggal_event"),
+      lokasi: formData.get("lokasi"),
+      tipe_tiket: formData.get("tipe_tiket") || "Reguler",     // WAJIB ADA
+      harga_tiket: Number(formData.get("harga_tiket")) || 0     // WAJIB NUMBER
+    };
+
+    try {
+      const res = await fetch("http://localhost:5000/events/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        alert("Event berhasil dibuat!");
+        navigate("/admin/events");
+      } else {
+        alert(result.error || result.message || "Gagal buat event");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Server error – cek console (F12)");
     }
-
-    onAddEvent(eventData);
-    
-    setEventData({
-      name: '',
-      date: '',
-      description: '',
-      price: ''
-    });
-
-    Swal.fire({
-  title: "Good job!",
-  text: "event berhasil ditambahkan",
-  icon: "success"
-});
-  };
-
-  const handleReset = () => {
-    setEventData({
-      name: '',
-      date: '',
-      description: '',
-      price: ''
-    });
   };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <header style={{ marginBottom: '30px' }}>
-        <h1 style={{ color: '#333', marginBottom: '10px' }}>Tambah Event</h1>
-        <p style={{ color: '#666' }}>Buat event baru untuk ditampilkan di platform</p>
-      </header>
+    <div className="p-8 max-w-4xl mx-auto">
+      <h1 className="text-4xl font-bold mb-8">Buat Event Baru</h1>
 
-      <div style={{ maxWidth: '600px' }}>
-        <form onSubmit={handleSubmit} style={{ 
-          background: 'white', 
-          padding: '30px', 
-          borderRadius: '8px', 
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}>
-          <div style={{ marginBottom: '25px' }}>
-            <h2 style={{ color: '#333', marginBottom: '10px', fontSize: '18px' }}>Nama Event *</h2>
-            <input
-              type="text"
-              name="name"
-              value={eventData.name}
-              onChange={handleChange}
-              placeholder="Masukkan nama event..."
-              style={{ 
-                width: '100%', 
-                padding: '12px', 
-                border: '1px solid #ddd', 
-                borderRadius: '4px', 
-                fontSize: '16px',
-                boxSizing: 'border-box'
-              }}
-              required
-            />
-          </div>
+      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl shadow-lg space-y-6">
+        <input name="nama_event" required placeholder="Nama Event" className="w-full p-4 border rounded-lg" />
+        <input name="lokasi" required placeholder="Lokasi" className="w-full p-4 border rounded-lg" />
+        <input name="tanggal_event" type="date" required className="w-full p-4 border rounded-lg" />
 
-          <div style={{ marginBottom: '25px' }}>
-            <h2 style={{ color: '#333', marginBottom: '10px', fontSize: '18px' }}>Tanggal Event *</h2>
-            <input
-              type="date"
-              name="date"
-              value={eventData.date}
-              onChange={handleChange}
-              style={{ 
-                width: '100%', 
-                padding: '12px', 
-                border: '1px solid #ddd', 
-                borderRadius: '4px', 
-                fontSize: '16px',
-                boxSizing: 'border-box'
-              }}
-              required
-            />
-          </div>
+        {/* WAJIB ISI INI DUA BIAR GAK ERROR */}
+        <input 
+          name="tipe_tiket" 
+          required 
+          placeholder="Tipe Tiket (contoh: VIP, Reguler, Presale)" 
+          className="w-full p-4 border rounded-lg" 
+        />
+        <input 
+          name="harga_tiket" 
+          type="number" 
+          required 
+          placeholder="Harga Tiket (contoh: 250000)" 
+          className="w-full p-4 border rounded-lg" 
+        />
 
-          <div style={{ marginBottom: '25px' }}>
-            <h2 style={{ color: '#333', marginBottom: '10px', fontSize: '18px' }}>Deskripsi Event</h2>
-            <textarea
-              name="description"
-              value={eventData.description}
-              onChange={handleChange}
-              placeholder="Masukkan deskripsi event..."
-              style={{ 
-                width: '100%', 
-                padding: '12px', 
-                border: '1px solid #ddd', 
-                borderRadius: '4px', 
-                fontSize: '16px',
-                boxSizing: 'border-box',
-                minHeight: '100px',
-                resize: 'vertical'
-              }}
-              rows="4"
-            />
-          </div>
-
-          <div style={{ marginBottom: '25px' }}>
-            <h2 style={{ color: '#333', marginBottom: '10px', fontSize: '18px' }}>Harga Event *</h2>
-            <input
-              type="number"
-              name="price"
-              value={eventData.price}
-              onChange={handleChange}
-              placeholder="Masukkan harga event..."
-              style={{ 
-                width: '100%', 
-                padding: '12px', 
-                border: '1px solid #ddd', 
-                borderRadius: '4px', 
-                fontSize: '16px',
-                boxSizing: 'border-box'
-              }}
-              required
-            />
-          </div>
-
-          <div style={{ display: 'flex', gap: '10px', marginTop: '30px' }}>
-            <button 
-              type="submit"
-              style={{
-                padding: '12px 24px',
-                background: '#3498db',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '16px'
-              }}
-            >
-              Tambah Event
-            </button>
-            <button 
-              type="button"
-              onClick={handleReset}
-              style={{
-                padding: '12px 24px',
-                background: '#95a5a6',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '16px'
-              }}
-            >
-              Reset Form
-            </button>
-          </div>
-        </form>
-      </div>
+        <div className="flex gap-4">
+          <button type="submit" className="bg-blue-600 text-white px-8 py-4 rounded-lg text-lg">
+            Buat Event
+          </button>
+          <button type="button" onClick={() => navigate("/admin/events")} className="bg-gray-500 text-white px-8 py-4 rounded-lg text-lg">
+            Batal
+          </button>
+        </div>
+      </form>
     </div>
   );
-};
-
-export default CreateEvent;
+}

@@ -29,31 +29,77 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    // 1. Cari user di database
+    
     const user = await prisma.login.findFirst({ where: { email: email.trim()} });
     if (!user) return res.status(404).json({ error: "Email Salah" });
 
     const validpass = await bcrypt.compare(password, user.password);
     if (!validpass) return res.status(401).json({ error: "Password Salah" });
 
-    const isAdmin = user.username.includes("@admin");
+    // 3. Tentukan role berdasarkan email (contoh sederhana)
+    //    Lebih baik simpan kolom `role` di tabel user, tapi kalau memang pakai @admin ini contohnya:
+    const isAdmin = email.includes("@admin");
+    const role = isAdmin ? "admin" : "user";
 
+    // 4. Buat JWT
     const token = jwt.sign(
-      { id_login: user.id_login, role: isAdmin ? "admin" : "user" },
+      { id: user.id_login, role },          // payload
       "RAHASIA_KEY",
-      { expiresIn: "1h" }
+      { expiresIn: "1h" }                    // 1 jam
     );
 
+    // 5. Kirim response
     res.json({
-      message: "Login berhasil",
+      message: isAdmin ? "Selamat datang Admin!" : "Selamat datang User!",
       token,
-      user: { ...user, role: isAdmin ? "admin" : "user" }
+      user: {
+        id: user.id_login,
+        email: user.email,
+        name: user.name,
+        role,                               // admin atau user
+      },
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: "Terjadi kesalahan server" });
   }
 };
 
-exports.googleLogin = async (req, res) => {
+// exports.login = async (req, res) => {
+//   try {
+    // const { email, password } = req.body;
+    // const user = await prisma.login.findFirst({ where: { email: email.trim()} });
+    // if (!user) return res.status(404).json({ error: "Email Salah" });
+
+    // const validpass = await bcrypt.compare(password, user.password);
+    // if (!validpass) return res.status(401).json({ error: "Password Salah" });
+
+//     const isAdmin = user.email.has ("@admin");
+
+//     const token = jwt.sign(
+//       { id_login: user.id_login, role: isAdmin ? "admin" : "user" },
+//       "RAHASIA_KEY",
+//       { expiresIn: "1h" }
+//     );
+
+//     res.json({
+//       message: "selamat datang admin",
+//       token,
+//       user: { ...user, role: isAdmin ? "admin" : "user" }
+//     });
+//     if (res.data.user.role === 'admin') {
+//       navigate('..Admin/src/pages/admin');           // atau '/admin/dashboard'
+//     } else {
+//       navigate('home.jsx');           // atau '/user/dashboard'
+//     }
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// };
+
+exports.loginGoogle = async (req, res) => {
   try {
     const { token } = req.body;
 

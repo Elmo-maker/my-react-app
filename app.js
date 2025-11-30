@@ -3,6 +3,7 @@ const cors = require ('cors');
 const app = express();
 require('dotenv').config();
 
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -13,17 +14,25 @@ const eventRoutes = require('./routes/routes-event');
 const detailRoutes = require('./routes/routes-tiket');
 const paymentRoutes = require('./routes/routes-payments');
 const transaksiRoutes = require('./routes/routes-transaksi');
+  // atau "./routes/events.js"
 
+app.get("/test", (req, res) => {
+  res.json({ message: "BACKEND JALAN BRO!!!" });
+});
 
+app.post("/test-post", (req, res) => {
+  console.log("ADA YANG POST KE /test-post:", req.body);
+  res.json({ success: true, data: req.body });
+});
 app.use('/login', loginRoutes);
 app.use('/admin', adminRoutes);
-app.use('/event', eventRoutes);
+app.use("/events", eventRoutes);
 app.use('/tiket', detailRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/transaksi', transaksiRoutes);
 
 
-const PORT = process.env.port || 3000;
+const PORT = process.env.port || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server berjalan di http://localhost:${PORT}`);

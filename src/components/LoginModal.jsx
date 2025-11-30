@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { Mail, Lock, X, Loader2, Chrome } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 // --- KONSTANTA GOOGLE ---
 // GANTI DENGAN CLIENT ID APLIKASI WEB ANDA DARI GOOGLE CLOUD CONSOLE
-const GOOGLE_CLIENT_ID = "GANTI_DENGAN_GOOGLE_CLIENT_ID_ANDA";
+const GOOGLE_CLIENT_ID = "1079040205204-n7ohrl1h0lealsm5jkv2gs9hqm1ieeau.apps.googleusercontent.com";
 // --- END KONSTANTA ---
 
 export default function LoginModal() {
@@ -12,6 +13,7 @@ export default function LoginModal() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const [regEmail, setRegEmail] = useState("");
   const [regPassword, setRegPassword] = useState("");
@@ -92,7 +94,7 @@ export default function LoginModal() {
     setIsLoading(true);
 
     try {
-      const res = await fetch("http://localhost:3000/login/login", {
+      const res = await fetch("http://localhost:5000/login/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -106,9 +108,20 @@ export default function LoginModal() {
         setIsOpen(false);
         setEmail("");
         setPassword("");
+        // const data = await res.json();
+        // console.log("DATA LOGIN:", data);
+
+        
+        if (data.user?.role === "admin") {
+        navigate("/admin");      // halaman admin (CRUD)
+        } else {
+        navigate("/");       // atau "/home"
+        }
+
       } else {
         alert(`Login gagal: ${data.error || "Cek email/password"}`);
       }
+
     } catch (err) {
       alert("Server error");
     } finally {
@@ -127,7 +140,7 @@ export default function LoginModal() {
 
     setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:3000/login/register", {
+      const res = await fetch("http://localhost:5000/login/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

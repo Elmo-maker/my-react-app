@@ -13,7 +13,7 @@ const {
 router.post("/", verifyuser, createTransaksi);
 
 // 🔐 Rute Melihat Riwayat (WAJIB Login) - GET /transaksi
-router.get("/", verifyuser, getAllTransaksi);
-router.get("/:id", verifyuser, getTransaksiById);
+router.get("/tr", verifyuser, getAllTransaksi);
+router.get("/trid/:id", verifyuser, getTransaksiById);
 
 module.exports = router;

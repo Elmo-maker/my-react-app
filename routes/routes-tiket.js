@@ -10,9 +10,9 @@ const {
   deleteTiket
 } = require('../controller/controller-tiket');
 
-router.post('/', verifyuser, verifyToken, createTiket)
-router.get('/:id_event', verifyToken, getDetailTiket);
-router.put('/:id', verifyToken, updateTiket);
-router.delete('/:id', verifyToken, deleteTiket);
+router.post('/create-ticket', verifyuser, verifyToken, createTiket)
+router.get('/detail/:id_event', verifyToken, getDetailTiket);
+router.put('/update/:id', verifyToken, updateTiket);
+router.delete('/delete/:id', verifyToken, deleteTiket);
 
 module.exports = router;

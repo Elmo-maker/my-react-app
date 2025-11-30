@@ -11,10 +11,29 @@ const Login = () => {
     
     // Simple validation - bisa diganti dengan auth real
     if (email && password) {
-      navigate('/admin');
-    } else {
+      navigate('/admin');  // Ganti dengan rute dashboard admin yang bena
+      } else {
       alert('Harap isi email dan password!');
     }
+  
+    // const isAdmin = user.email.includes("admin@admin.com");
+    
+    //     const token = jwt.sign(
+    //       { id_login: user.id_login, role: isAdmin ? "admin" : "user" },
+    //       "RAHASIA_KEY",
+    //       { expiresIn: "1h" }
+    //     );
+    
+    //     res.json({
+    //       message: "Login berhasil",
+    //       token,
+    //       user: { ...user, role: isAdmin ? "admin" : "user" }
+    //     });
+    //     if (res.data.user.role === 'admin') {
+    //       navigate('pages/Dashboard.jsx');           // atau '/admin/dashboard'
+    //     } else {
+    //       navigate('home.jsx');           // atau '/user/dashboard'
+    //     }
   };
 
   return (

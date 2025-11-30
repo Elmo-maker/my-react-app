@@ -1,70 +1,38 @@
-import React, { useState } from "react";
-import { Outlet, useNavigate, useLocation } from "react-router-dom";
+// src/layouts/AdminLayout.jsx
+import { Outlet, Link } from "react-router-dom";
 
-const AdminLayout = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const menuItems = [
-    { name: 'Tambah Event', path: '/admin/events/create', icon: '➕' },
-    { name: 'Daftar Event', path: '/admin/events', icon: '📋' },
-    { name: 'Status Pembayaran', path: '/admin/payments', icon: '💰' },
-  ];
+export default function AdminLayout({ children }) {
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "/";
+  };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
-      <div style={{ 
-        width: '250px', 
-        background: '#2c3e50', 
-        color: 'white',
-        display: 'flex',
-        flexDirection: 'column'
-      }}>
-        <div style={{ padding: '20px', borderBottom: '1px solid #34495e' }}>
-          <h2 style={{ margin: 0, fontSize: '18px' }}>ADMIN PAGE</h2>
-        </div>
-        
-        <nav style={{ padding: '20px 0', flex: 1 }}>
-          {menuItems.map((item) => (
-            <button
-              key={item.path}
-              style={{ 
-                width: '100%', 
-                background: location.pathname === item.path ? '#3498db' : 'none', 
-                border: 'none', 
-                color: 'white', 
-                padding: '12px 20px',
-                textAlign: 'left',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                transition: 'background 0.3s'
-              }}
-              onClick={() => navigate(item.path)}
-            >
-              <span style={{ fontSize: '18px' }}>{item.icon}</span>
-              <span>{item.name}</span>
-            </button>
-          ))}
+    <div className="flex min-h-screen bg-gray-900 text-white">
+      {/* Sidebar */}
+      <aside className="w-64 bg-gray-800 p-6">
+        <h1 className="text-3xl font-bold mb-10 text-yellow-400">Festify Admin</h1>
+        <nav className="space-y-4">
+          <Link to="/admin" className="block py-3 px-4 bg-gray-700 rounded hover:bg-gray-600">Dashboard</Link>
+          <Link to="/admin/events" className="block py-3 px-4 rounded hover:bg-gray-600">Events</Link>
+          <Link to="/admin/tickets" className="block py-3 px-4 rounded hover:bg-gray-600">Tickets</Link>
+          <Link to="/admin/transactions" className="block py-3 px-4 rounded hover:bg-gray-600">Transactions</Link>
         </nav>
+        <button onClick={handleLogout} className="mt-12 w-full bg-red-600 py-3 rounded hover:bg-red-700">
+          Logout
+        </button>
+      </aside>
 
-        <div style={{ padding: '20px', borderTop: '1px solid #34495e' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '24px' }}>👤</span>
-            <div>
-              <div style={{ fontWeight: 'bold' }}>PROFILE</div>
-              <div style={{ fontSize: '12px', opacity: '0.8' }}>Filled text</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ flex: 1, background: '#ecf0f1' }}>
-        <Outlet />
+      {/* Content */}
+      <div className="flex-1 bg-gray-100 text-gray-900">
+        <header className="bg-white shadow p-6">
+          <h2 className="text-2xl font-bold">Admin Panel</h2>
+        </header>
+        <main className="p-8">
+          {children || <Outlet />}
+        </main>
       </div>
     </div>
   );
-};
-
-export default AdminLayout;
+}

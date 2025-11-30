@@ -63,7 +63,7 @@ export default function Checkout() {
       };
 
       // Panggil backend untuk generate token
-      const response = await fetch('http://localhost:3000/api/payment/create-transaction', {
+      const response = await fetch('http://localhost:5000/api/payment/create-transaction', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
