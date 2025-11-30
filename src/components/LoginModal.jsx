@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { Mail, Lock, X, Loader2 } from "lucide-react";
+import { Mail, Lock, X, Loader2, Chrome } from "lucide-react";
+
+// --- KONSTANTA GOOGLE ---
+// GANTI DENGAN CLIENT ID APLIKASI WEB ANDA DARI GOOGLE CLOUD CONSOLE
+const GOOGLE_CLIENT_ID = "GANTI_DENGAN_GOOGLE_CLIENT_ID_ANDA";
+// --- END KONSTANTA ---
 
 export default function LoginModal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,20 +18,75 @@ export default function LoginModal() {
   const [regConfirm, setRegConfirm] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
-
-  // ESC close modal
+  
+  // ---------------- SETUP GOOGLE LOGIN ----------------
   useEffect(() => {
+    // 1. Muat skrip Google Sign-In
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.onload = () => {
+        if (window.google) {
+            window.google.accounts.id.initialize({
+                client_id: GOOGLE_CLIENT_ID,
+                callback: handleCredentialResponse, // Tautkan ke fungsi handler
+            });
+            // Render tombol hanya ketika modal Login terbuka
+            if (isOpen && !isRegisterOpen) {
+                window.google.accounts.id.renderButton(
+                    document.getElementById("google-sign-in-button"),
+                    { theme: "outline", size: "large", type: "standard", shape: "pill", text: "continue_with" }
+                );
+            }
+        }
+    };
+    document.head.appendChild(script);
+
+    // 2. ESC close modal
     const handleEscape = (e) => {
-      if (e.key === "Escape") {
-        setIsOpen(false);
-        setIsRegisterOpen(false);
-      }
+        if (e.key === "Escape") {
+            setIsOpen(false);
+            setIsRegisterOpen(false);
+        }
     };
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
-  }, []);
+  }, [isOpen, isRegisterOpen]); // Jalankan ulang saat modal dibuka/tutup
 
-  // ---------------- LOGIN ----------------
+  // ---------------- GOOGLE HANDLER ----------------
+  const handleCredentialResponse = async (response) => {
+    if (!response.credential) {
+        alert("Gagal mendapatkan kredensial Google.");
+        return;
+    }
+
+    setIsLoading(true);
+    try {
+        // Mengirim token ID Google ke backend untuk divalidasi
+        const res = await fetch("http://localhost:3000/login/google", { // <--- ENDPOINT BACKEND BARU
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token: response.credential }), // Kirim ID token Google
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            localStorage.setItem("token", data.token); // Simpan token aplikasi
+            alert(`Login Google berhasil: ${data.message}`);
+            setIsOpen(false);
+        } else {
+            alert(`Login Google gagal: ${data.error || "Gagal memproses token Google"}`);
+        }
+
+    } catch (err) {
+        alert("Server error saat login Google.");
+    } finally {
+        setIsLoading(false);
+    }
+  };
+
+  // ---------------- LOGIN MANUAL ----------------
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -56,7 +116,7 @@ export default function LoginModal() {
     }
   };
 
-  // ---------------- REGISTER ----------------
+  // ---------------- REGISTER MANUAL ----------------
   const handleRegister = async (e) => {
     e.preventDefault();
 
@@ -71,7 +131,7 @@ export default function LoginModal() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          username: regEmail, // pakai email juga sebagai username
+          username: regEmail,
           email: regEmail,
           password: regPassword,
         }),
@@ -119,7 +179,32 @@ export default function LoginModal() {
             </button>
 
             <h2 className="text-4xl font-light text-white text-center mb-1">Selamat Datang</h2>
-            <p className="text-center text-white/60 text-sm mb-10">Silakan masuk untuk melanjutkan.</p>
+            <p className="text-center text-white/60 text-sm mb-6">Silakan masuk untuk melanjutkan.</p>
+
+            {/* Tombol Login Google */}
+            <div className="mb-6">
+                <p className="text-center text-white/50 text-xs mb-3">Opsi Login</p>
+                
+                {/* DIV INI AKAN DIRENDER OLEH GOOGLE SDK. 
+                  Jika Anda menggunakan library react-oauth, kodenya akan lebih sederhana.
+                  Karena kita menggunakan pure JS inject, ID ini harus ada.
+                */}
+                <div id="google-sign-in-button" className="mx-auto w-full flex justify-center">
+                    {/* Placeholder jika Google SDK belum dimuat */}
+                    {isLoading && (
+                        <button disabled className="w-full py-3.5 rounded-lg font-semibold text-lg bg-gray-700 text-white/50 cursor-not-allowed flex items-center justify-center">
+                            <Loader2 className="animate-spin mr-2" size={20} /> Memuat Google...
+                        </button>
+                    )}
+                </div>
+
+                <div className="flex items-center my-4">
+                    <div className="flex-grow border-t border-white/10"></div>
+                    <span className="flex-shrink mx-4 text-white/50 text-xs">ATAU</span>
+                    <div className="flex-grow border-t border-white/10"></div>
+                </div>
+
+            </div>
 
             <form onSubmit={handleLogin} className="space-y-6">
               <div>
@@ -190,7 +275,7 @@ export default function LoginModal() {
         </div>
       )}
 
-      {/* REGISTER MODAL */}
+      {/* REGISTER MODAL (TIDAK BERUBAH) */}
       {isRegisterOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
           <div className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl w-full max-w-sm p-8 relative">
