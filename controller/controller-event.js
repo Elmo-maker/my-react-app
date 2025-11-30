@@ -40,7 +40,7 @@ exports.updateEvent = async (req, res) => {
     const { id } = req.params;
     const { nama_event, lokasi, tanggal_event } = req.body;
 
-    const updated = await prisma.event.update({
+    const updated = await prisma.event_tiket.update({
       where: { id: Number(id) },
       data: { nama_event, lokasi, tanggal_event }
     });
