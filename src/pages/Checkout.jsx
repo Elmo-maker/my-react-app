@@ -13,6 +13,16 @@ export default function Checkout() {
   const [form, setForm] = useState({ name: "", email: "", phone: "" });
   const [isLoading, setIsLoading] = useState(false);
 
+  const totalPrice = (ticketCount * event.price) || 0;
+  
+  if (!event) {
+    return (
+      <div className="bg-gray-950 text-white min-h-screen pt-24 text-center">
+        <p className="text-xl">Event tidak ditemukan. Kembali ke <a href="/" className="text-indigo-400 hover:underline">beranda</a>.</p>
+      </div>
+    );
+  }
+
   // Load Midtrans Snap script
   useEffect(() => {
     const midtransScriptUrl = 'https://app.sandbox.midtrans.com/snap/snap.js';
@@ -28,25 +38,14 @@ export default function Checkout() {
     };
   }, []);
 
-  const totalPrice = (ticketCount * event.price) || 0;
-  
-  if (!event) {
-    return (
-      <div className="bg-gray-950 text-white min-h-screen pt-24 text-center">
-        <p className="text-xl">Event tidak ditemukan. Kembali ke <a href="/" className="text-indigo-400 hover:underline">beranda</a>.</p>
-      </div>
-    );
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // Generate unique order ID
       const orderId = `ORDER-${Date.now()}`;
 
-      // Prepare data untuk backend
+      // Data untuk backend
       const transactionData = {
         orderId: orderId,
         grossAmount: totalPrice,
@@ -63,7 +62,7 @@ export default function Checkout() {
         }]
       };
 
-      // Call backend API untuk create transaction
+      // Panggil backend untuk generate token
       const response = await fetch('http://localhost:3000/api/payment/create-transaction', {
         method: 'POST',
         headers: {
@@ -75,10 +74,8 @@ export default function Checkout() {
       const data = await response.json();
 
       if (data.success && data.token) {
-        // Trigger Snap popup dengan token
         window.snap.pay(data.token, {
           onSuccess: function(result) {
-            console.log('Payment success:', result);
             navigate('/payment/success', {
               state: {
                 orderId: orderId,
@@ -90,7 +87,6 @@ export default function Checkout() {
             });
           },
           onPending: function(result) {
-            console.log('Payment pending:', result);
             navigate('/payment/pending', {
               state: {
                 orderId: orderId,
@@ -101,12 +97,10 @@ export default function Checkout() {
             });
           },
           onError: function(result) {
-            console.log('Payment error:', result);
             alert('Pembayaran gagal. Silakan coba lagi.');
             setIsLoading(false);
           },
           onClose: function() {
-            console.log('Payment popup closed');
             setIsLoading(false);
           }
         });
@@ -115,7 +109,6 @@ export default function Checkout() {
       }
 
     } catch (error) {
-      console.error('Error:', error);
       alert('Terjadi kesalahan: ' + error.message);
       setIsLoading(false);
     }
@@ -126,7 +119,7 @@ export default function Checkout() {
       <Navbar />
       <div className="bg-gray-950 text-white min-h-screen pt-24 pb-16">
         <div className="max-w-xl mx-auto px-6 py-8 bg-gray-900 rounded-xl shadow-2xl border border-gray-800">
-          
+          {/* --- TAMPILAN TIDAK DIUBAH --- */}
           <h2 className="text-3xl font-bold mb-6 border-b border-indigo-500/50 pb-2 text-indigo-400 flex items-center space-x-2">
             <ShoppingCart size={28} />
             <span>Konfirmasi Checkout</span>
@@ -139,7 +132,7 @@ export default function Checkout() {
               Harga Satuan: <span className="text-white">Rp {event.price.toLocaleString()}</span>
             </p>
           </div>
-          
+
           <div className="mb-6">
             <label className="block text-sm font-semibold mb-2 text-gray-300 flex items-center space-x-2">
               <Ticket size={18} className="text-indigo-400" />
@@ -159,7 +152,7 @@ export default function Checkout() {
             <h3 className="text-2xl font-bold mb-4 border-b border-gray-800 pb-2 text-white">
               Detail Pembeli
             </h3>
-            
+            {/* --- INPUT FORM TIDAK DIUBAH --- */}
             <div className="mb-4">
               <label className="block text-sm font-semibold mb-2 text-gray-300 flex items-center space-x-2">
                 <User size={18} className="text-indigo-400" />
@@ -173,7 +166,6 @@ export default function Checkout() {
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
               />
             </div>
-
             <div className="mb-4">
               <label className="block text-sm font-semibold mb-2 text-gray-300 flex items-center space-x-2">
                 <Mail size={18} className="text-indigo-400" />
@@ -188,7 +180,6 @@ export default function Checkout() {
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
               />
             </div>
-
             <div className="mb-6">
               <label className="block text-sm font-semibold mb-2 text-gray-300 flex items-center space-x-2">
                 <Phone size={18} className="text-indigo-400" />
@@ -234,7 +225,6 @@ export default function Checkout() {
           </form>
         </div>
       </div>
-      <Footer />
     </>
   );
 }

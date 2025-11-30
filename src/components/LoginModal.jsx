@@ -14,10 +14,10 @@ export default function LoginModal() {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  // ESC close
+  // ESC close modal
   useEffect(() => {
-    const handleEscape = (event) => {
-      if (event.key === "Escape") {
+    const handleEscape = (e) => {
+      if (e.key === "Escape") {
         setIsOpen(false);
         setIsRegisterOpen(false);
       }
@@ -26,26 +26,28 @@ export default function LoginModal() {
     return () => document.removeEventListener("keydown", handleEscape);
   }, []);
 
-  // ---- HANDLE LOGIN ----
+  // ---------------- LOGIN ----------------
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/login", {
+      const res = await fetch("http://localhost:3000/login/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
+
       if (res.ok) {
+        localStorage.setItem("token", data.token);
         alert(`Login berhasil: ${data.message}`);
         setIsOpen(false);
         setEmail("");
         setPassword("");
       } else {
-        alert(`Login gagal: ${data.message}`);
+        alert(`Login gagal: ${data.error || "Cek email/password"}`);
       }
     } catch (err) {
       alert("Server error");
@@ -54,7 +56,7 @@ export default function LoginModal() {
     }
   };
 
-  // ---- HANDLE REGISTER ----
+  // ---------------- REGISTER ----------------
   const handleRegister = async (e) => {
     e.preventDefault();
 
@@ -64,12 +66,15 @@ export default function LoginModal() {
     }
 
     setIsLoading(true);
-
     try {
-      const res = await fetch("http://localhost:5000/api/register", {
+      const res = await fetch("http://localhost:3000/login/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: regEmail, password: regPassword }),
+        body: JSON.stringify({
+          username: regEmail, // pakai email juga sebagai username
+          email: regEmail,
+          password: regPassword,
+        }),
       });
 
       const data = await res.json();
@@ -82,12 +87,11 @@ export default function LoginModal() {
         setRegEmail("");
         setRegPassword("");
         setRegConfirm("");
-
       } else {
-        alert(`Gagal register: ${data.message}`);
+        alert(`Gagal register: ${data.error || "Cek input"}`);
       }
     } catch (err) {
-      alert("Error server");
+      alert("Server error");
     } finally {
       setIsLoading(false);
     }
@@ -95,21 +99,18 @@ export default function LoginModal() {
 
   return (
     <>
-      {/* BUTTON UTAMA */}
+      {/* BUTTON LOGIN */}
       <button
         onClick={() => setIsOpen(true)}
-        className="bg-gray-900 text-amber-300 px-7 py-3 rounded-xl shadow-2xl shadow-gray-900/50 
-                   border border-amber-300/30 hover:bg-gray-800 transition duration-300 tracking-wider"
+        className="bg-gray-900 text-amber-300 px-7 py-3 rounded-xl shadow-2xl shadow-gray-900/50 border border-amber-300/30 hover:bg-gray-800 transition duration-300 tracking-wider"
       >
         Login
       </button>
 
-      {/* ================= LOGIN MODAL ================= */}
+      {/* LOGIN MODAL */}
       {isOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
           <div className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl w-full max-w-sm p-8 relative">
-
-            {/* CLOSE BTN */}
             <button
               onClick={() => setIsOpen(false)}
               className="absolute top-4 right-4 text-white/50 hover:text-amber-300 transition"
@@ -117,16 +118,10 @@ export default function LoginModal() {
               <X size={20} />
             </button>
 
-            {/* TITLE */}
             <h2 className="text-4xl font-light text-white text-center mb-1">Selamat Datang</h2>
-            <p className="text-center text-white/60 text-sm mb-10">
-              Silakan masuk untuk melanjutkan.
-            </p>
+            <p className="text-center text-white/60 text-sm mb-10">Silakan masuk untuk melanjutkan.</p>
 
-            {/* FORM LOGIN */}
             <form onSubmit={handleLogin} className="space-y-6">
-
-              {/* EMAIL */}
               <div>
                 <label className="text-white/70 mb-2 text-sm block">EMAIL</label>
                 <div className="flex items-center gap-3 bg-black/20 border border-white/20 rounded-lg px-4 py-3">
@@ -143,7 +138,6 @@ export default function LoginModal() {
                 </div>
               </div>
 
-              {/* PASSWORD */}
               <div>
                 <label className="text-white/70 mb-2 text-sm block">PASSWORD</label>
                 <div className="flex items-center gap-3 bg-black/20 border border-white/20 rounded-lg px-4 py-3">
@@ -160,16 +154,14 @@ export default function LoginModal() {
                 </div>
               </div>
 
-              {/* LOGIN BUTTON */}
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full py-3.5 rounded-lg font-semibold text-lg tracking-wider
-                  ${
-                    isLoading
-                      ? "bg-gray-700 text-white/50 cursor-not-allowed"
-                      : "bg-gray-800 text-amber-300 border border-amber-300/60 hover:bg-amber-300 hover:text-gray-900 transition"
-                  }`}
+                className={`w-full py-3.5 rounded-lg font-semibold text-lg tracking-wider ${
+                  isLoading
+                    ? "bg-gray-700 text-white/50 cursor-not-allowed"
+                    : "bg-gray-800 text-amber-300 border border-amber-300/60 hover:bg-amber-300 hover:text-gray-900 transition"
+                }`}
               >
                 {isLoading ? (
                   <span className="flex items-center justify-center">
@@ -180,7 +172,6 @@ export default function LoginModal() {
                 )}
               </button>
 
-              {/* REGISTER LINK */}
               <p className="text-white/60 text-sm text-center mt-4">
                 Belum punya akun?{" "}
                 <button
@@ -199,12 +190,10 @@ export default function LoginModal() {
         </div>
       )}
 
-      {/* ================= REGISTER MODAL ================= */}
+      {/* REGISTER MODAL */}
       {isRegisterOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
           <div className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl w-full max-w-sm p-8 relative">
-
-            {/* CLOSE */}
             <button
               onClick={() => setIsRegisterOpen(false)}
               className="absolute top-4 right-4 text-white/50 hover:text-amber-300 transition"
@@ -213,13 +202,9 @@ export default function LoginModal() {
             </button>
 
             <h2 className="text-4xl font-light text-white text-center mb-1">Register</h2>
-            <p className="text-center text-white/60 text-sm mb-10">
-              Buat akun untuk mulai menggunakan aplikasi.
-            </p>
+            <p className="text-center text-white/60 text-sm mb-10">Buat akun untuk mulai menggunakan aplikasi.</p>
 
             <form onSubmit={handleRegister} className="space-y-6">
-
-              {/* EMAIL */}
               <div>
                 <label className="text-white/70 mb-2 text-sm block">EMAIL</label>
                 <div className="flex items-center gap-3 bg-black/20 border border-white/20 rounded-lg px-4 py-3">
@@ -235,7 +220,6 @@ export default function LoginModal() {
                 </div>
               </div>
 
-              {/* PASSWORD */}
               <div>
                 <label className="text-white/70 mb-2 text-sm block">PASSWORD</label>
                 <div className="flex items-center gap-3 bg-black/20 border border-white/20 rounded-lg px-4 py-3">
@@ -251,7 +235,6 @@ export default function LoginModal() {
                 </div>
               </div>
 
-              {/* CONFIRM PASSWORD */}
               <div>
                 <label className="text-white/70 mb-2 text-sm block">KONFIRMASI PASSWORD</label>
                 <div className="flex items-center gap-3 bg-black/20 border border-white/20 rounded-lg px-4 py-3">
@@ -267,16 +250,14 @@ export default function LoginModal() {
                 </div>
               </div>
 
-              {/* REGISTER BUTTON */}
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full py-3.5 rounded-lg font-semibold text-lg tracking-wider
-                  ${
-                    isLoading
-                      ? "bg-gray-700 text-white/50 cursor-not-allowed"
-                      : "bg-gray-800 text-amber-300 border border-amber-300/60 hover:bg-amber-300 hover:text-gray-900 transition"
-                  }`}
+                className={`w-full py-3.5 rounded-lg font-semibold text-lg tracking-wider ${
+                  isLoading
+                    ? "bg-gray-700 text-white/50 cursor-not-allowed"
+                    : "bg-gray-800 text-amber-300 border border-amber-300/60 hover:bg-amber-300 hover:text-gray-900 transition"
+                }`}
               >
                 {isLoading ? (
                   <span className="flex items-center justify-center">
