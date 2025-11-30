@@ -1,8 +1,10 @@
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { OAuth2Client } = require('google-auth-library');
 
 const prisma = new PrismaClient();
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 exports.register = async (req, res) => {
   try {
@@ -27,7 +29,7 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await prisma.login.findFirst({ where: { email } });
+    const user = await prisma.login.findFirst({ where: { email: email.trim()} });
     if (!user) return res.status(404).json({ error: "Email Salah" });
 
     const validpass = await bcrypt.compare(password, user.password);
@@ -48,5 +50,53 @@ exports.login = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+};
+
+exports.googleLogin = async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    const ticket = await googleClient.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID
+    });
+
+    const payload = ticket.getPayload();
+    const email = payload.email;
+    const username = payload.name;
+
+    let user = await prisma.login.findFirst({ where: { email } });
+
+    if (!user) {
+      user = await prisma.login.create({
+        data: {
+          username,
+          email,
+          password: "",
+          role: "user"
+        }
+      });
+    }
+
+    const jwtToken = jwt.sign(
+      { id_login: user.id_login, role: user.role },
+      "RAHASIA_KEY",
+      { expiresIn: "1h" }
+    );
+
+    res.json({
+      message: "Login Google berhasil",
+      token: jwtToken,
+      user: {
+        id_login: user.id_login,
+        username: user.username,
+        email: user.email,
+        role: user.role
+      }
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: "Token Google tidak valid: " + err.message });
   }
 };
