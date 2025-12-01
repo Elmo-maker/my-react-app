@@ -10,7 +10,7 @@ const {
   deleteEvent
 } = require('../controller/controller-event');
 
-router.post('/events/create', verifyToken, createEvent)
+router.post('/create', createEvent)
 router.get('/all', getEvents);
 router.put('/upd/:id', verifyToken, updateEvent);
 router.delete('/del/:id', verifyToken, deleteEvent);

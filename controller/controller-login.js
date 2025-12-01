@@ -132,7 +132,7 @@ exports.loginGoogle = async (req, res) => {
     );
 
     res.json({
-      message: "Login Google berhasil",
+      message: "Google Connected",
       token: jwtToken,
       user: {
         id_login: user.id_login,

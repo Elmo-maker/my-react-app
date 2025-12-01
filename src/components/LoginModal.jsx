@@ -65,7 +65,7 @@ export default function LoginModal() {
     setIsLoading(true);
     try {
         // Mengirim token ID Google ke backend untuk divalidasi
-        const res = await fetch("http://localhost:3000/login/google", { // <--- ENDPOINT BACKEND BARU
+        const res = await fetch("http://localhost:5000/login/google", { // <--- ENDPOINT BACKEND BARU
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ token: response.credential }), // Kirim ID token Google

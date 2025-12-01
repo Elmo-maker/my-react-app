@@ -1,7 +1,7 @@
 // src/pages/admin/components/EventForm.jsx
 export default function EventForm({ event, onClose, onSuccess }) {
   const token = localStorage.getItem("token");
-  const API = "http://localhost:3000";
+  const API = "http://localhost:5000";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
