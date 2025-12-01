@@ -4,11 +4,24 @@ const prisma = new PrismaClient();
 
 exports.createEvent = async (req, res) => {
     try {
-        const { nama_event, tanggal_event, lokasi, tipe_tiket, harga_tiket } = req.body;
-        console.log("Menerima data event:", req.body);
-        const event = await prisma.event_tiket.create({
-            data: { nama_event, tanggal_event, lokasi }
-        });
+        console.log("Request Body:", req.body); // Debug: log request body
+        const { nama_event, lokasi, tanggal_event, detailTiket} = req.body;
+
+        const tanggalFix = tanggal_event.includes("T") 
+      ? tanggal_event 
+      : `${tanggal_event}T00:00:00.000Z`;
+
+        const newEvent = await prisma.event_tiket.create({
+      data: {
+        nama_event,
+        tanggal_event: new Date(tanggal_event),
+        lokasi,
+        detailTiket,
+      },
+      include: {
+        detailTiket: true,
+      },
+    });
 
         const tiket = await prisma.detail_tiket.create({
             data: {

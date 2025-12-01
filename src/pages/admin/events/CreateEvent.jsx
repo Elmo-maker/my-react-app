@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 
 
+
 export default function CreateEvent() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
@@ -16,8 +17,8 @@ export default function CreateEvent() {
       nama_event: formData.get("nama_event"),
       tanggal_event: formData.get("tanggal_event"),
       lokasi: formData.get("lokasi"),
-      tipe_tiket: formData.get("tipe_tiket") || "Reguler",     // WAJIB ADA
-      harga_tiket: Number(formData.get("harga_tiket")) || 0     // WAJIB NUMBER
+      detailTiket: formData.get("detail_tiket") || "Reguler",     // WAJIB ADA
+         // WAJIB NUMBER
     };
 
     try {
@@ -62,13 +63,7 @@ export default function CreateEvent() {
           placeholder="Tipe Tiket (contoh: VIP, Reguler, Presale)" 
           className="w-full p-4 border rounded-lg" 
         />
-        <input 
-          name="harga_tiket" 
-          type="number" 
-          required 
-          placeholder="Harga Tiket (contoh: 250000)" 
-          className="w-full p-4 border rounded-lg" 
-        />
+        
 
         <div className="flex gap-4">
           <button type="submit" className="bg-blue-600 text-white px-8 py-4 rounded-lg text-lg">
