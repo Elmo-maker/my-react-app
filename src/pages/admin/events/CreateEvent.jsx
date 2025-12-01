@@ -30,6 +30,8 @@ export default function CreateEvent() {
         body: JSON.stringify(payload),
       });
 
+      console.log(res);
+
       const result = await res.json();
 
       if (res.ok) {
