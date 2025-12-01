@@ -9,6 +9,26 @@ const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 exports.register = async (req, res) => {
   try {
     const { username, password, email } = req.body;
+    if (!username || !email || !password) {
+      return res.status(400).json({ error: "Semua field harus diisi" });
+    }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(!emailRegex.test) {
+      return res.status(400).json({error : "Format Email tidak benar"});
+    }
+
+    const existingUser = await prisma.login.findFirst({
+      where: {email:email.trim()}
+    });
+
+    if(existingUser) {
+      return res.status(400).json({error:"email sudah terdaftar"});
+    }
+
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+    if(!passwordRegex.test(password)) {
+      return res.status(400).json({error:"Password minimal 6 karakter dan harus mengandung huruf & angka"});
+    }
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await prisma.login.create({
