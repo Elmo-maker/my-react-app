@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Mail, Lock, X, Loader2, Chrome } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Swal from 'sweetalert2';
 
 // --- KONSTANTA GOOGLE ---
 // GANTI DENGAN CLIENT ID APLIKASI WEB ANDA DARI GOOGLE CLOUD CONSOLE
@@ -82,7 +83,11 @@ export default function LoginModal() {
         }
 
     } catch (err) {
-        alert("Server error saat login Google.");
+        Swal.fire({
+          title: "The Internet?",
+          text: "That thing is still around?",
+          icon: "question"
+        });
     } finally {
         setIsLoading(false);
     }
