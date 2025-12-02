@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 // --- KONSTANTA GOOGLE ---
 // GANTI DENGAN CLIENT ID APLIKASI WEB ANDA DARI GOOGLE CLOUD CONSOLE
-const GOOGLE_CLIENT_ID = "1079040205204-n7ohrl1h0lealsm5jkv2gs9hqm1ieeau.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = "787449943526-7jnvoe5ue9q7eho33vodh5s0a6nsr3la.apps.googleusercontent.com";
 // --- END KONSTANTA ---
 
 export default function LoginModal() {
