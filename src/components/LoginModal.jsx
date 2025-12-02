@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Mail, Lock, X, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Swal from 'sweetalert2';
 
 const GOOGLE_CLIENT_ID = "1079040205204-n7ohrl1h0lealsm5jkv2gs9hqm1ieeau.apps.googleusercontent.com";
 
@@ -66,18 +67,29 @@ export default function LoginModal() {
     if (!response.credential) return alert("Gagal mendapatkan kredensial Google");
     setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/login/google", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: response.credential }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        localStorage.setItem("token", data.token);
-        window.dispatchEvent(new Event("login-success"));
-      } else alert(data.error || "Gagal login Google");
-    } catch {
-      alert("Server error Google login");
+        // Mengirim token ID Google ke backend untuk divalidasi
+        const res = await fetch("http://localhost:5000/login/google", { // <--- ENDPOINT BACKEND BARU
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token: response.credential }), // Kirim ID token Google
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            localStorage.setItem("token", data.token); // Simpan token aplikasi
+            alert(`Login Google berhasil: ${data.message}`);
+            setIsOpen(false);
+        } else {
+            alert(`Login Google gagal: ${data.error || "Gagal memproses token Google"}`);
+        }
+
+    } catch (err) {
+        Swal.fire({
+          title: "The Internet?",
+          text: "That thing is still around?",
+          icon: "question"
+        });
     } finally {
       setIsLoading(false);
     }
