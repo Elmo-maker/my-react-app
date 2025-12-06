@@ -123,7 +123,7 @@ import HakUser from "./pages/legal/HakUser";
 import Responsibilites from "./pages/legal/Responsibilites";
 import Refund from "./pages/legal/Refund";
 import Instagram from "./pages/social/Instagram";
-import Tiktok from "./pages/social/Tiktok";
+import Tiktok from "./pages/social/tiktok";
 import Youtube from "./pages/social/Youtube";
 
 // Komponen
@@ -177,7 +177,7 @@ function App() {
           <Route path="/legal/refund" element={<Refund />} />
 
           <Route path="/social/instagram" element={<Instagram />} />
-          <Route path="/social/tiktok" element={<Tiktok />} />
+          <Route path="/social/Tiktok" element={<Tiktok />} />
           <Route path="/social/youtube" element={<Youtube />} />
         </Routes>
       </div>
