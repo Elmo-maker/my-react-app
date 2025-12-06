@@ -14,5 +14,4 @@ router.post('/create', createEvent)
 router.get('/all', getEvents);
 router.put('/upd/:id', verifyToken, updateEvent);
 router.delete('/del/:id', verifyToken, deleteEvent);
-
 module.exports = router;

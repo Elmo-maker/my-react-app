@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 function verifyToken(req, res, next) {
+  console.log("Memverifikasi token untuk admin...");
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) return res.status(401).json({ error: "Token tidak ada" });
 

@@ -21,6 +21,7 @@ const detailRoutes = require('./routes/routes-tiket');
 const paymentRoutes = require('./routes/routes-payments');
 const transaksiRoutes = require('./routes/routes-transaksi');
   // atau "./routes/events.js"
+console.log(eventRoutes.stack.map(r => r.route?.path));
 
 app.get("/test", (req, res) => {
   res.json({ message: "BACKEND JALAN BRO!!!" });
