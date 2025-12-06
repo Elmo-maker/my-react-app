@@ -1,0 +1,43 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model login {
+  id_login Int     @id @default(autoincrement())
+  username String
+  password String
+  email    String
+  role     String @default("user")
+  transaksi transaksi[]
+}
+
+model event_tiket {
+  id_event      Int            @id @default(autoincrement())
+  nama_event    String
+  tanggal_event DateTime
+  lokasi String
+  harga_tiket Int
+  transaksi     transaksi[]
+}
+
+model transaksi {
+  id_transaksi Int @id @default(autoincrement())
+  loginId      Int
+  tiketId      Int
+  jumlah       Int
+  total_harga  Int
+  tanggal_transaksi DateTime @default(now())
+  user   login        @relation(fields: [loginId], references: [id_login])
+  tiket event_tiket @relation(fields: [tiketId], references: [id_event])
+}
