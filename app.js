@@ -4,13 +4,14 @@ const app = express();
 require('dotenv').config();
 
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "*");
-  res.header("Access-Control-Allow-Methods", "*");
-  if (req.method === "OPTIONS") return res.sendStatus(200);
-  next();
-});
+// app.use((req, res, next) => {
+//   res.header("Access-Control-Allow-Origin", "*");
+//   res.header("Access-Control-Allow-Headers", "*");
+//   res.header("Access-Control-Allow-Methods", "*");
+//   if (req.method === "OPTIONS") return res.sendStatus(200);
+//   next();
+// });
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -20,6 +21,8 @@ const eventRoutes = require('./routes/routes-event');
 const detailRoutes = require('./routes/routes-tiket');
 const paymentRoutes = require('./routes/routes-payments');
 const transaksiRoutes = require('./routes/routes-transaksi');
+
+
   // atau "./routes/events.js"
 console.log(eventRoutes.stack.map(r => r.route?.path));
 

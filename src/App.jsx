@@ -76,7 +76,7 @@
 //           <Route path="/social/instagram" element={<Instagram />} />
 //           <Route path="/social/tiktok" element={<Tiktok />} />
 //           <Route path="/social/youtube" element={<Youtube />} />
-          
+
 //           {/* 404 CATCH-ALL */}
 //           {/* <Route path="*" element={<NotFound />} /> */}
 
@@ -90,7 +90,9 @@
 
 // export default App;
 
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+
 
 // Layout & Halaman Admin
 import AdminLayout from "./components/layouts/AdminLayout";   // <-- PASTIKAN FILE INI ADA
@@ -100,10 +102,16 @@ import Tickets from "./pages/admin/Tickets";
 import Transactions from "./pages/admin/Transactions";
 import CreateEvent from "./pages/admin/events/CreateEvent";
 import EditEvent from "./pages/admin/events/EditEvent";
+import LoginModal from "./components/LoginModal";
+import MyTickets from "./pages/admin/Tickets";
+import History from "./pages/History";
+
+
 
 
 // Halaman User
 import Home from "./pages/Home";
+import event from "./pages/History";
 import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
 import FAQ from "./pages/FAQ";
@@ -123,7 +131,7 @@ import HakUser from "./pages/legal/HakUser";
 import Responsibilites from "./pages/legal/Responsibilites";
 import Refund from "./pages/legal/Refund";
 import Instagram from "./pages/social/Instagram";
-import Tiktok from "./pages/social/tiktok";
+import Tiktok from "./pages/social/Tiktok";
 import Youtube from "./pages/social/Youtube";
 
 // Komponen
@@ -134,8 +142,36 @@ function App() {
   const location = useLocation();
   const isAdmin = location.pathname.startsWith("/admin");
 
-  // KALAU SEDANG DI /admin → PAKAI ADMIN LAYOUT (tanpa navbar/footer user)
+  // Helper function untuk cek apakah user adalah admin
+  const isAdminUser = () => {
+    const token = localStorage.getItem("token");
+    if (!token) return false;
+
+    try {
+      const decoded = jwtDecode(token);
+
+      // Cek expired
+      const currentTime = Date.now() / 1000;
+      if (decoded.exp && decoded.exp < currentTime) {
+        localStorage.removeItem("token");
+        return false;
+      }
+
+      return decoded.role === "admin";
+    } catch (error) {
+      console.log("Error decoding token:", error);
+      return false;
+    }
+  };
+
+  // KALAU SEDANG DI /admin → CEK DULU APAKAH USER ADALAH ADMIN
   if (isAdmin) {
+    // Jika bukan admin, redirect ke homepage
+    if (!isAdminUser()) {
+      return <Navigate to="/" replace />;
+    }
+
+    // Jika admin, tampilkan admin layout
     return (
       <AdminLayout>
         <Routes>
@@ -154,16 +190,21 @@ function App() {
   return (
     <>
       <Navbar />
+      <LoginModal />
       <div className="bg-gray-50 min-h-screen">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/history" element={<History />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/event/:id" element={<EventDetail />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/my-tickets" element={<MyTickets />} />
           <Route path="/payment" element={<Payment />} />
           <Route path="/payment/success" element={<PaymentSuccess />} />
+
+
 
           <Route path="/help/privacy" element={<Privacy />} />
           <Route path="/help/support" element={<Support />} />
@@ -177,11 +218,12 @@ function App() {
           <Route path="/legal/refund" element={<Refund />} />
 
           <Route path="/social/instagram" element={<Instagram />} />
-          <Route path="/social/Tiktok" element={<Tiktok />} />
+          <Route path="/social/tiktok" element={<Tiktok />} />
           <Route path="/social/youtube" element={<Youtube />} />
         </Routes>
       </div>
       <Footer />
+
     </>
   );
 }

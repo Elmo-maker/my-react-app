@@ -1,7 +1,25 @@
+// const express = require ('express');
+// const router = express.Router();
+// const  verifyuser = require ('../middleware/middleware-user')
+// const { verifyToken } = require ('../middleware/middleware-admin');
+
+// const {
+//   createEvent,
+//   getEvents,
+//   updateEvent,
+//   deleteEvent
+// } = require('../controller/controller-event');
+
+// router.post('/create', createEvent)
+// router.get('/all', getEvents);
+// router.put('/upd/:id', verifyToken, updateEvent);
+// router.delete('/del/:id', verifyToken, deleteEvent);
+// module.exports = router;
+
 const express = require ('express');
 const router = express.Router();
 const  verifyuser = require ('../middleware/middleware-user')
-const { verifyToken } = require ('../middleware/middleware-admin');
+const  verifyAdmin  = require ('../middleware/middleware-admin');
 
 const {
   createEvent,
@@ -12,6 +30,6 @@ const {
 
 router.post('/create', createEvent)
 router.get('/all', getEvents);
-router.put('/upd/:id', verifyToken, updateEvent);
-router.delete('/del/:id', verifyToken, deleteEvent);
+router.put('/upd/:id', updateEvent);
+router.delete('/del/:id', deleteEvent);
 module.exports = router;
