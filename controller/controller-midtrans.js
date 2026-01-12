@@ -1,4 +1,7 @@
 const midtransClient = require('midtrans-client');
+const { PrismaClient } = require('@prisma/client');
+const jwt = require('jsonwebtoken');
+const prisma = new PrismaClient();
 
 // Konfigurasi Snap Midtrans
 const snap = new midtransClient.Snap({
@@ -12,7 +15,21 @@ const createTransaction = async (req, res) => {
     try {
         const { orderId, grossAmount, customerDetails, itemDetails } = req.body;
 
-        console.log('Creating transaction:', { orderId, grossAmount, customerDetails });
+        console.log('Creating transaction:', { orderId, grossAmount, customerDetails, itemDetails });
+
+        // Decode JWT untuk mendapatkan loginId (jika ada)
+        let loginId = 1; // default untuk guest
+        const authHeader = req.headers.authorization;
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            try {
+                const token = authHeader.split(' ')[1];
+                const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                loginId = decoded.id || 1;
+                console.log('Login ID from token:', loginId);
+            } catch (err) {
+                console.log('Invalid token, using guest loginId');
+            }
+        }
 
         // Parameter transaksi sesuai Midtrans docs
         const parameter = {
@@ -31,9 +48,31 @@ const createTransaction = async (req, res) => {
 
         // Buat transaksi ke Midtrans
         const transaction = await snap.createTransaction(parameter);
-        
+
         console.log('Transaction created successfully:', transaction.token);
-        
+
+        // SIMPAN KE DATABASE PRISMA
+        const eventId = itemDetails?.[0]?.id;
+        const jumlahTiket = itemDetails?.[0]?.quantity || 1;
+
+        console.log('Saving to DB:', { eventId, jumlahTiket, orderId, grossAmount, loginId });
+
+        // Selalu simpan transaksi
+        const savedTransaction = await prisma.transaksi.create({
+            data: {
+                orderId: orderId,
+                id_event: Number(eventId) || 1,
+                jumlah_tiket: Number(jumlahTiket),
+                total_harga: Number(grossAmount),
+                nama_pembeli: customerDetails?.first_name || "Unknown",
+                email: customerDetails?.email || "",
+                telepon: customerDetails?.phone || "",
+                status: "pending",
+                loginId: loginId,
+            }
+        });
+        console.log('Transaction saved to database:', savedTransaction.id_transaksi);
+
         res.status(200).json({
             success: true,
             token: transaction.token,
@@ -54,25 +93,28 @@ const createTransaction = async (req, res) => {
 const handleNotification = async (req, res) => {
     try {
         const notification = await snap.transaction.notification(req.body);
-        
+
         const orderId = notification.order_id;
         const transactionStatus = notification.transaction_status;
         const fraudStatus = notification.fraud_status;
 
         console.log(`Transaction notification received. Order ID: ${orderId}. Transaction status: ${transactionStatus}. Fraud status: ${fraudStatus}`);
 
-        // Handle berbagai status pembayaran
-        if (transactionStatus === 'success') {
-            if (fraudStatus === 'accept') {
-                console.log('Payment success');
-            }
-        } else if (transactionStatus === 'settlement') {
-            console.log('Payment settled');
+        // Update status di database
+        let status = "pending";
+        if (transactionStatus === 'capture' || transactionStatus === 'settlement') {
+            status = fraudStatus === 'accept' || !fraudStatus ? 'paid' : 'pending';
         } else if (transactionStatus === 'cancel' || transactionStatus === 'deny' || transactionStatus === 'expire') {
-            console.log('Payment failed');
-        } else if (transactionStatus === 'pending') {
-            console.log('Payment pending');
+            status = 'failed';
         }
+
+        // Update database
+        await prisma.transaksi.updateMany({
+            where: { orderId: orderId },
+            data: { status: status }
+        });
+
+        console.log(`Order ${orderId} status updated to: ${status}`);
 
         res.status(200).json({ message: 'Notification received' });
 
