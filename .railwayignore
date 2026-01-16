@@ -1,0 +1,8 @@
+# Ignore frontend build files (frontend deployed on Vercel)
+dist/
+.vite/
+
+# Ignore development files
+*.log
+.env.local
+.DS_Store

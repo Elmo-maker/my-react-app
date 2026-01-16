@@ -1,5 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { useState } from "react";
+import { API_BASE_URL } from "../config/api";
 
 export default function Payment() {
   const { state } = useLocation();
@@ -14,7 +15,7 @@ export default function Payment() {
   const handlePayment = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/payment/create-transaction", {
+      const res = await fetch(`${API_BASE_URL}/api/payment/create-transaction`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

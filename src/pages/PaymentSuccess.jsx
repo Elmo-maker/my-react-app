@@ -14,7 +14,7 @@ export default function PaymentSuccess() {
 
   return (
     <>
-      <Navbar />
+      
       <div className="bg-gray-950 text-white min-h-screen pt-24 pb-16">
         <div className="max-w-2xl mx-auto px-6 py-8 text-center">
           

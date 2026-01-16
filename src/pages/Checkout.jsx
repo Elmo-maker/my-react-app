@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { Ticket, DollarSign, User, Mail, Phone, ShoppingCart, Loader2 } from "lucide-react";
+import { API_BASE_URL } from "../config/api";
 
 export default function Checkout() {
   const { state } = useLocation();
@@ -13,8 +14,8 @@ export default function Checkout() {
   const [form, setForm] = useState({ name: "", email: "", phone: "" });
   const [isLoading, setIsLoading] = useState(false);
 
-  const totalPrice = (ticketCount * event.price) || 0;
-  
+  const totalPrice = (ticketCount * event.harga_tiket) || 0;
+
   if (!event) {
     return (
       <div className="bg-gray-950 text-white min-h-screen pt-24 text-center">
@@ -26,11 +27,11 @@ export default function Checkout() {
   // Load Midtrans Snap script
   useEffect(() => {
     const midtransScriptUrl = 'https://app.sandbox.midtrans.com/snap/snap.js';
-    
+
     const scriptTag = document.createElement('script');
     scriptTag.src = midtransScriptUrl;
     scriptTag.setAttribute('data-client-key', import.meta.env.VITE_MIDTRANS_CLIENT_KEY);
-    
+
     document.body.appendChild(scriptTag);
 
     return () => {
@@ -55,18 +56,20 @@ export default function Checkout() {
           phone: form.phone
         },
         itemDetails: [{
-          id: event.id || 'event-1',
-          price: event.price,
+          id: event.id_event || event.id,  // Gunakan id_event dari schema
+          price: event.harga_tiket,
           quantity: ticketCount,
-          name: event.title
+          name: event.nama_event
         }]
       };
 
       // Panggil backend untuk generate token
-      const response = await fetch('http://localhost:5000/api/payment/create-transaction', {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/api/payment/create-transaction`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : '',
         },
         body: JSON.stringify(transactionData)
       });
@@ -75,7 +78,21 @@ export default function Checkout() {
 
       if (data.success && data.token) {
         window.snap.pay(data.token, {
-          onSuccess: function(result) {
+          onSuccess: async function (result) {
+            // Update status di database setelah pembayaran berhasil
+            try {
+              await fetch(`${API_BASE_URL}/transaksi/update-status`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': token ? `Bearer ${token}` : '',
+                },
+                body: JSON.stringify({ orderId: orderId, status: 'paid' })
+              });
+            } catch (err) {
+              console.error('Error updating status:', err);
+            }
+
             navigate('/payment/success', {
               state: {
                 orderId: orderId,
@@ -86,7 +103,7 @@ export default function Checkout() {
               }
             });
           },
-          onPending: function(result) {
+          onPending: function (result) {
             navigate('/payment/pending', {
               state: {
                 orderId: orderId,
@@ -96,11 +113,11 @@ export default function Checkout() {
               }
             });
           },
-          onError: function(result) {
+          onError: function (result) {
             alert('Pembayaran gagal. Silakan coba lagi.');
             setIsLoading(false);
           },
-          onClose: function() {
+          onClose: function () {
             setIsLoading(false);
           }
         });
@@ -126,10 +143,10 @@ export default function Checkout() {
           </h2>
 
           <div className="p-4 bg-gray-800 rounded-lg mb-6 border border-gray-700">
-            <h3 className="text-xl font-bold mb-1 text-white">{event.title}</h3>
-            <p className="text-sm text-gray-400">{event.date} | {event.location}</p>
+            <h3 className="text-xl font-bold mb-1 text-white">{event.nama_event}</h3>
+            <p className="text-sm text-gray-400">{event.date} | {event.lokasi}</p>
             <p className="text-lg font-semibold text-gray-300 mt-3">
-              Harga Satuan: <span className="text-white">Rp {event.price.toLocaleString()}</span>
+              Harga Satuan: <span className="text-white">Rp {event.harga_tiket.toLocaleString()}</span>
             </p>
           </div>
 
@@ -205,8 +222,8 @@ export default function Checkout() {
               </p>
             </div>
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={isLoading}
               className="bg-indigo-600 text-white w-full py-3 rounded-lg font-bold text-lg 
                          hover:bg-indigo-500 transition duration-300 transform 

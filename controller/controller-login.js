@@ -12,22 +12,22 @@ exports.register = async (req, res) => {
     if (!username || !email || !password) {
       return res.status(400).json({ error: "Semua field harus diisi" });
     }
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if(!emailRegex.test) {
-      return res.status(400).json({error : "Format Email tidak benar"});
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test) {
+      return res.status(400).json({ error: "Format Email tidak benar" });
     }
 
     const existingUser = await prisma.login.findFirst({
-      where: {email:email.trim()}
+      where: { email: email.trim() }
     });
 
-    if(existingUser) {
-      return res.status(400).json({error:"email sudah terdaftar"});
+    if (existingUser) {
+      return res.status(400).json({ error: "email sudah terdaftar" });
     }
 
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
-    if(!passwordRegex.test(password)) {
-      return res.status(400).json({error:"Password minimal 6 karakter dan harus mengandung huruf & angka"});
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({ error: "Password minimal 6 karakter dan harus mengandung huruf & angka" });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -51,34 +51,32 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
 
     // 1. Cari user di database
-    
-    const user = await prisma.login.findFirst({ where: { email: email.trim()} });
+
+    const user = await prisma.login.findFirst({ where: { email: email.trim() } });
     if (!user) return res.status(404).json({ error: "Email Salah" });
 
     const validpass = await bcrypt.compare(password, user.password);
     if (!validpass) return res.status(401).json({ error: "Password Salah" });
 
-    // 3. Tentukan role berdasarkan email (contoh sederhana)
-    //    Lebih baik simpan kolom `role` di tabel user, tapi kalau memang pakai @admin ini contohnya:
-    const isAdmin = email.includes("@admin");
-    const role = isAdmin ? "admin" : "user";
+    // 2. Ambil role dari database
+    const role = user.role;
 
-    // 4. Buat JWT
+    // 3. Buat JWT dengan role dari database
     const token = jwt.sign(
-      { id: user.id_login, role },          // payload
-      "RAHASIA_KEY",
-      { expiresIn: "1h" }                    // 1 jam
+      { id: user.id_login, role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
     );
 
-    // 5. Kirim response
+    // 4. Kirim response
     res.json({
-      message: isAdmin ? "Selamat datang Admin!" : "Selamat datang User!",
+      message: role === "admin" ? "Selamat datang Admin!" : "Selamat datang User!",
       token,
       user: {
         id: user.id_login,
         email: user.email,
-        name: user.name,
-        role,                               // admin atau user
+        username: user.username,
+        role,
       },
     });
   } catch (err) {
@@ -89,12 +87,12 @@ exports.login = async (req, res) => {
 
 // exports.login = async (req, res) => {
 //   try {
-    // const { email, password } = req.body;
-    // const user = await prisma.login.findFirst({ where: { email: email.trim()} });
-    // if (!user) return res.status(404).json({ error: "Email Salah" });
+// const { email, password } = req.body;
+// const user = await prisma.login.findFirst({ where: { email: email.trim()} });
+// if (!user) return res.status(404).json({ error: "Email Salah" });
 
-    // const validpass = await bcrypt.compare(password, user.password);
-    // if (!validpass) return res.status(401).json({ error: "Password Salah" });
+// const validpass = await bcrypt.compare(password, user.password);
+// if (!validpass) return res.status(401).json({ error: "Password Salah" });
 
 //     const isAdmin = user.email.has ("@admin");
 
@@ -146,8 +144,8 @@ exports.loginGoogle = async (req, res) => {
     }
 
     const jwtToken = jwt.sign(
-      { id_login: user.id_login, role: user.role },
-      "RAHASIA_KEY",
+      { id: user.id_login, role: user.role },
+      process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
@@ -155,7 +153,7 @@ exports.loginGoogle = async (req, res) => {
       message: "Google Connected",
       token: jwtToken,
       user: {
-        id_login: user.id_login,
+        id: user.id_login,
         username: user.username,
         email: user.email,
         role: user.role
