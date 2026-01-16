@@ -20,6 +20,7 @@ const eventRoutes = require('./routes/routes-event');
 const detailRoutes = require('./routes/routes-tiket');
 const paymentRoutes = require('./routes/routes-payments');
 const transaksiRoutes = require('./routes/routes-transaksi');
+const emailRoutes = require ('./routes/routes-sendtiket');
   // atau "./routes/events.js"
 console.log(eventRoutes.stack.map(r => r.route?.path));
 
@@ -37,9 +38,9 @@ app.use("/events", eventRoutes);
 app.use('/tiket', detailRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/transaksi', transaksiRoutes);
+app.use('/email', emailRoutes);
 
-
-const PORT = process.env.port || 5000;
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server berjalan di http://localhost:${PORT}`);
