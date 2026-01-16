@@ -1,7 +1,8 @@
 // src/pages/admin/Events.jsx
 import { useState, useEffect } from "react";
+import { API_BASE_URL } from "../../config/api";
 
-const API_BASE = "http://localhost:5000"; // sesuaikan port backend kamu
+const API_BASE = API_BASE_URL; // sesuaikan port backend kamu
 
 export default function Events() {
   const [events, setEvents] = useState([]);
@@ -11,7 +12,11 @@ export default function Events() {
   // Fetch semua event → pake /all
   const fetchEvents = async () => {
     try {
-      const res = await fetch(`${API_BASE}/events/all`);
+      const res = await fetch(`${API_BASE}/events/all`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await res.json();
       setEvents(data);
     } catch (err) {

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { Ticket, DollarSign, User, Mail, Phone, ShoppingCart, Loader2 } from "lucide-react";
+import { API_BASE_URL } from "../config/api";
 
 export default function Checkout() {
   const { state } = useLocation();
@@ -64,7 +65,7 @@ export default function Checkout() {
 
       // Panggil backend untuk generate token
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/payment/create-transaction', {
+      const response = await fetch(`${API_BASE_URL}/api/payment/create-transaction`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -80,7 +81,7 @@ export default function Checkout() {
           onSuccess: async function (result) {
             // Update status di database setelah pembayaran berhasil
             try {
-              await fetch(`http://localhost:5000/transaksi/update-status`, {
+              await fetch(`${API_BASE_URL}/transaksi/update-status`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Mail, Lock, X, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
+import { API_BASE_URL } from "../config/api";
 
 // --- KONSTANTA GOOGLE ---
 // GANTI DENGAN CLIENT ID APLIKASI WEB ANDA DARI GOOGLE CLOUD CONSOLE
@@ -70,29 +71,29 @@ export default function LoginModal() {
     if (!response.credential) return alert("Gagal mendapatkan kredensial Google");
     setIsLoading(true);
     try {
-        // Mengirim token ID Google ke backend untuk divalidasi
-        const res = await fetch("http://localhost:5000/login/google", { // <--- ENDPOINT BACKEND BARU
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ token: response.credential }), // Kirim ID token Google
-        });
+      // Mengirim token ID Google ke backend untuk divalidasi
+      const res = await fetch(`${API_BASE_URL}/login/google`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: response.credential }), // Kirim ID token Google
+      });
 
-        const data = await res.json();
+      const data = await res.json();
 
-        if (res.ok) {
-            localStorage.setItem("token", data.token); // Simpan token aplikasi
-            alert(`Login Google berhasil: ${data.message}`);
-            setIsOpen(false);
-        } else {
-            alert(`Login Google gagal: ${data.error || "Gagal memproses token Google"}`);
-        }
+      if (res.ok) {
+        localStorage.setItem("token", data.token); // Simpan token aplikasi
+        alert(`Login Google berhasil: ${data.message}`);
+        setIsOpen(false);
+      } else {
+        alert(`Login Google gagal: ${data.error || "Gagal memproses token Google"}`);
+      }
 
     } catch (err) {
-        Swal.fire({
-          title: "The Internet?",
-          text: "That thing is still around?",
-          icon: "question"
-        });
+      Swal.fire({
+        title: "The Internet?",
+        text: "That thing is still around?",
+        icon: "question"
+      });
     } finally {
       setIsLoading(false);
     }
@@ -103,7 +104,7 @@ export default function LoginModal() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/login/login", {
+      const res = await fetch(`${API_BASE_URL}/login/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -129,7 +130,7 @@ export default function LoginModal() {
     if (regPassword !== regConfirm) return alert("Password tidak sama");
     setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/login/register", {
+      const res = await fetch(`${API_BASE_URL}/login/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -179,7 +180,7 @@ export default function LoginModal() {
                 <div className="flex items-center gap-3 bg-black/20 border border-white/20 rounded-lg px-4 py-3">
                   <Mail className="text-amber-300" size={20} />
                   <input type="email" required placeholder="nama@domain.com" className="bg-transparent text-white w-full focus:outline-none"
-                    value={email} onChange={(e)=>setEmail(e.target.value)} disabled={isLoading} />
+                    value={email} onChange={(e) => setEmail(e.target.value)} disabled={isLoading} />
                 </div>
               </div>
               <div>
@@ -187,14 +188,14 @@ export default function LoginModal() {
                 <div className="flex items-center gap-3 bg-black/20 border border-white/20 rounded-lg px-4 py-3">
                   <Lock className="text-amber-300" size={20} />
                   <input type="password" required placeholder="••••••••" className="bg-transparent text-white w-full focus:outline-none"
-                    value={password} onChange={(e)=>setPassword(e.target.value)} disabled={isLoading} />
+                    value={password} onChange={(e) => setPassword(e.target.value)} disabled={isLoading} />
                 </div>
               </div>
               <button type="submit" disabled={isLoading} className={`w-full py-3.5 rounded-lg font-semibold text-lg tracking-wider ${isLoading ? "bg-gray-700 text-white/50 cursor-not-allowed" : "bg-gray-800 text-amber-300 border border-amber-300/60 hover:bg-amber-300 hover:text-gray-900 transition"}`}>
-                {isLoading ? <Loader2 className="animate-spin mx-auto" size={20}/> : "MASUK"}
+                {isLoading ? <Loader2 className="animate-spin mx-auto" size={20} /> : "MASUK"}
               </button>
               <p className="text-white/60 text-sm text-center mt-4">
-                Belum punya akun? <button type="button" onClick={()=>{setIsOpen(false); setIsRegisterOpen(true);}} className="text-amber-300 hover:underline">Register</button>
+                Belum punya akun? <button type="button" onClick={() => { setIsOpen(false); setIsRegisterOpen(true); }} className="text-amber-300 hover:underline">Register</button>
               </p>
             </form>
           </div>
@@ -205,36 +206,36 @@ export default function LoginModal() {
       {isRegisterOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
           <div className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl w-full max-w-sm p-8 relative">
-            <button onClick={()=>setIsRegisterOpen(false)} className="absolute top-4 right-4 text-white/50 hover:text-amber-300"><X size={20}/></button>
+            <button onClick={() => setIsRegisterOpen(false)} className="absolute top-4 right-4 text-white/50 hover:text-amber-300"><X size={20} /></button>
             <h2 className="text-4xl font-light text-white text-center mb-1">Register</h2>
             <p className="text-center text-white/60 text-sm mb-10">Buat akun untuk mulai menggunakan aplikasi.</p>
             <form onSubmit={handleRegister} className="space-y-6">
               <div>
                 <label className="text-white/70 mb-2 text-sm block">EMAIL</label>
                 <div className="flex items-center gap-3 bg-black/20 border border-white/20 rounded-lg px-4 py-3">
-                  <Mail className="text-amber-300" size={20}/>
-                  <input type="email" required placeholder="nama@domain.com" className="bg-transparent text-white w-full focus:outline-none" value={regEmail} onChange={(e)=>setRegEmail(e.target.value)}/>
+                  <Mail className="text-amber-300" size={20} />
+                  <input type="email" required placeholder="nama@domain.com" className="bg-transparent text-white w-full focus:outline-none" value={regEmail} onChange={(e) => setRegEmail(e.target.value)} />
                 </div>
               </div>
               <div>
                 <label className="text-white/70 mb-2 text-sm block">PASSWORD</label>
                 <div className="flex items-center gap-3 bg-black/20 border border-white/20 rounded-lg px-4 py-3">
-                  <Lock className="text-amber-300" size={20}/>
-                  <input type="password" required placeholder="••••••••" className="bg-transparent text-white w-full focus:outline-none" value={regPassword} onChange={(e)=>setRegPassword(e.target.value)}/>
+                  <Lock className="text-amber-300" size={20} />
+                  <input type="password" required placeholder="••••••••" className="bg-transparent text-white w-full focus:outline-none" value={regPassword} onChange={(e) => setRegPassword(e.target.value)} />
                 </div>
               </div>
               <div>
                 <label className="text-white/70 mb-2 text-sm block">KONFIRMASI PASSWORD</label>
                 <div className="flex items-center gap-3 bg-black/20 border border-white/20 rounded-lg px-4 py-3">
-                  <Lock className="text-amber-300" size={20}/>
-                  <input type="password" required placeholder="••••••••" className="bg-transparent text-white w-full focus:outline-none" value={regConfirm} onChange={(e)=>setRegConfirm(e.target.value)}/>
+                  <Lock className="text-amber-300" size={20} />
+                  <input type="password" required placeholder="••••••••" className="bg-transparent text-white w-full focus:outline-none" value={regConfirm} onChange={(e) => setRegConfirm(e.target.value)} />
                 </div>
               </div>
               <button type="submit" disabled={isLoading} className={`w-full py-3.5 rounded-lg font-semibold text-lg tracking-wider ${isLoading ? "bg-gray-700 text-white/50 cursor-not-allowed" : "bg-gray-800 text-amber-300 border border-amber-300/60 hover:bg-amber-300 hover:text-gray-900 transition"}`}>
-                {isLoading ? <Loader2 className="animate-spin mx-auto" size={20}/> : "DAFTAR"}
+                {isLoading ? <Loader2 className="animate-spin mx-auto" size={20} /> : "DAFTAR"}
               </button>
               <p className="text-white/60 text-sm text-center mt-4">
-                Sudah punya akun? <button type="button" onClick={()=>{setIsRegisterOpen(false); setIsOpen(true);}} className="text-amber-300 hover:underline">Login</button>
+                Sudah punya akun? <button type="button" onClick={() => { setIsRegisterOpen(false); setIsOpen(true); }} className="text-amber-300 hover:underline">Login</button>
               </p>
             </form>
           </div>

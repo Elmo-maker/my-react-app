@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { Calendar, MapPin, Ticket, AlertCircle } from 'lucide-react';
+import { API_BASE_URL } from '../config/api';
 
 export default function MyTickets() {
   const [transaksi, setTransaksi] = useState([]);
@@ -29,7 +30,7 @@ export default function MyTickets() {
     }
 
     // Ambil riwayat transaksi
-    fetch('http://localhost:5000/transaksi/tr', {
+    fetch(`${API_BASE_URL}/transaksi/tr`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',

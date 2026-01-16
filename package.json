@@ -4,14 +4,17 @@
   "description": "",
   "main": "app.js",
   "type": "commonjs",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "start": "node app.js",
-    "dev": "vite"
+    "dev": "vite",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
     "@prisma/client": "5.22.0",
-    "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",

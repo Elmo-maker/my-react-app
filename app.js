@@ -1,5 +1,5 @@
 const express = require('express');
-const cors = require ('cors');
+const cors = require('cors');
 const app = express();
 require('dotenv').config();
 
@@ -23,7 +23,7 @@ const paymentRoutes = require('./routes/routes-payments');
 const transaksiRoutes = require('./routes/routes-transaksi');
 
 
-  // atau "./routes/events.js"
+// atau "./routes/events.js"
 console.log(eventRoutes.stack.map(r => r.route?.path));
 
 app.get("/test", (req, res) => {
@@ -42,7 +42,7 @@ app.use('/api/payment', paymentRoutes);
 app.use('/transaksi', transaksiRoutes);
 
 
-const PORT = process.env.port || 5000;
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server berjalan di http://localhost:${PORT}`);

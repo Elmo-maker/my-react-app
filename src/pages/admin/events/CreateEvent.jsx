@@ -11,7 +11,7 @@
 //   const handleSubmit = async (e) => {
 //     e.preventDefault();
 //     const formData = new FormData(e.target);
-    
+
 //     // PAKSA KIRIM SEMUA FIELD YANG DIBUTUHKAN CONTROLLER
 //     const payload = {
 //       nama_event: formData.get("nama_event"),
@@ -63,7 +63,7 @@
 //           placeholder="Tipe Tiket (contoh: VIP, Reguler, Presale)" 
 //           className="w-full p-4 border rounded-lg" 
 //         />
-        
+
 
 //         <div className="flex gap-4">
 //           <button type="submit" className="bg-blue-600 text-white px-8 py-4 rounded-lg text-lg">
@@ -80,6 +80,7 @@
 
 // src/pages/admin/events/CreateEvent.jsx  ← GANTI YANG INI SAJA
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../../../config/api";
 
 
 
@@ -91,21 +92,21 @@ export default function CreateEvent() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
-    
+
     // PAKSA KIRIM SEMUA FIELD YANG DIBUTUHKAN CONTROLLER
-  const payload = {
-    nama_event: formData.get("nama_event"),
-    tanggal_event: formData.get("tanggal_event"),
-    lokasi: formData.get("lokasi"),
-    harga_tiket: Number(formData.get("harga_tiket")), 
-    jumlah_tiket: Number(formData.get("jumlah_tiket")),// Pastikan jadi number!
-    img: formData.get("img") || "https://via.placeholder.com/400x200",
-    jenis_tiket: formData.get("jenis_tiket") || "Reguler",
-    deskripsi: formData.get("deskripsi") || "Deskripsi belum ditambahkan."
-  };
+    const payload = {
+      nama_event: formData.get("nama_event"),
+      tanggal_event: formData.get("tanggal_event"),
+      lokasi: formData.get("lokasi"),
+      harga_tiket: Number(formData.get("harga_tiket")),
+      jumlah_tiket: Number(formData.get("jumlah_tiket")),// Pastikan jadi number!
+      img: formData.get("img") || "https://via.placeholder.com/400x200",
+      jenis_tiket: formData.get("jenis_tiket") || "Reguler",
+      deskripsi: formData.get("deskripsi") || "Deskripsi belum ditambahkan."
+    };
 
     try {
-      const res = await fetch("http://localhost:5000/events/create", {
+      const res = await fetch(`${API_BASE_URL}/events/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -138,8 +139,8 @@ export default function CreateEvent() {
         <input name="nama_event" required placeholder="Nama Event" className="w-full p-4 border rounded-lg" />
         <input name="lokasi" required placeholder="Lokasi" className="w-full p-4 border rounded-lg" />
         <input name="tanggal_event" type="date" required className="w-full p-4 border rounded-lg" />
-        
-        
+
+
 
         {/* WAJIB ISI INI DUA BIAR GAK ERROR */}
         {/* <input 
@@ -149,29 +150,29 @@ export default function CreateEvent() {
           className="w-full p-4 border rounded-lg" 
         /> */}
         <input
-        name="harga_tiket"
-        required
-        placeholder="Harga Ticket"
-        className="w-full p-4 border rounded-lg"
-      />
-      <input
-        name="jumlah_tiket"
-        required
-        placeholder="Jumlah Ticket"
-        className="w-full p-4 border rounded-lg"
-      />
-      <input 
-          name="jenis_tiket" required 
-          placeholder="Jenis Tiket (contoh: VIP, Reguler, Presale)" 
-          className="w-full p-4 border rounded-lg" 
+          name="harga_tiket"
+          required
+          placeholder="Harga Ticket"
+          className="w-full p-4 border rounded-lg"
+        />
+        <input
+          name="jumlah_tiket"
+          required
+          placeholder="Jumlah Ticket"
+          className="w-full p-4 border rounded-lg"
+        />
+        <input
+          name="jenis_tiket" required
+          placeholder="Jenis Tiket (contoh: VIP, Reguler, Presale)"
+          className="w-full p-4 border rounded-lg"
         />
         <input name="deskripsi" required placeholder="Deskripsi Event" className="w-full p-4 border rounded-lg" />
-      <input 
-  name="img" 
-  placeholder="URL Gambar Event" 
-  className="w-full p-4 border rounded-lg" 
-/>
-        
+        <input
+          name="img"
+          placeholder="URL Gambar Event"
+          className="w-full p-4 border rounded-lg"
+        />
+
 
         <div className="flex gap-4">
           <button type="submit" className="bg-blue-600 text-white px-8 py-4 rounded-lg text-lg">

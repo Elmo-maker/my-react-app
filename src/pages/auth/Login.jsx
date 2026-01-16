@@ -8,22 +8,22 @@
 
 //   const handleSubmit = (e) => {
 //     e.preventDefault();
-    
+
 //     // Simple validation - bisa diganti dengan auth real
 //     if (email && password) {
 //       navigate('/admin');  // Ganti dengan rute dashboard admin yang bena
 //       } else {
 //       alert('Harap isi email dan password!');
 //     }
-  
+
 //     // const isAdmin = user.email.includes("admin@admin.com");
-    
+
 //     //     const token = jwt.sign(
 //     //       { id_login: user.id_login, role: isAdmin ? "admin" : "user" },
 //     //       "RAHASIA_KEY",
 //     //       { expiresIn: "1h" }
 //     //     );
-    
+
 //     //     res.json({
 //     //       message: "Login berhasil",
 //     //       token,
@@ -49,7 +49,7 @@
 //       <h2 style={{ textAlign: 'center', marginBottom: '30px', color: '#333' }}>
 //         Login to Admin Festify
 //       </h2>
-      
+
 //       <form onSubmit={handleSubmit}>
 //         <div style={{ marginBottom: '1rem' }}>
 //           <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>E-mail</label>
@@ -85,13 +85,13 @@
 //             }}
 //           />
 //         </div>
-        
+
 //         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.5rem' }}>
 //           <a href="#" style={{ fontSize: '14px', color: '#3498db', textDecoration: 'none' }}>
 //             Lupa Password?
 //           </a>
 //         </div>
-        
+
 //         <button
 //           type="submit"
 //           style={{
@@ -108,7 +108,7 @@
 //         >
 //           Lanjut
 //         </button>
-        
+
 //         <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
 //           <a href="#" style={{ fontSize: '14px', color: '#3498db', textDecoration: 'none' }}>
 //             Daftar
@@ -131,22 +131,22 @@
 
 //   const handleSubmit = (e) => {
 //     e.preventDefault();
-    
+
 //     // Simple validation - bisa diganti dengan auth real
 //     if (email && password) {
 //       navigate('/admin');  // Ganti dengan rute dashboard admin yang bena
 //       } else {
 //       alert('Harap isi email dan password!');
 //     }
-  
+
 //     // const isAdmin = user.email.includes("admin@admin.com");
-    
+
 //     //     const token = jwt.sign(
 //     //       { id_login: user.id_login, role: isAdmin ? "admin" : "user" },
 //     //       "RAHASIA_KEY",
 //     //       { expiresIn: "1h" }
 //     //     );
-    
+
 //     //     res.json({
 //     //       message: "Login berhasil",
 //     //       token,
@@ -172,7 +172,7 @@
 //       <h2 style={{ textAlign: 'center', marginBottom: '30px', color: '#333' }}>
 //         Login to Admin Festify
 //       </h2>
-      
+
 //       <form onSubmit={handleSubmit}>
 //         <div style={{ marginBottom: '1rem' }}>
 //           <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>E-mail</label>
@@ -208,13 +208,13 @@
 //             }}
 //           />
 //         </div>
-        
+
 //         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.5rem' }}>
 //           <a href="#" style={{ fontSize: '14px', color: '#3498db', textDecoration: 'none' }}>
 //             Lupa Password?
 //           </a>
 //         </div>
-        
+
 //         <button
 //           type="submit"
 //           style={{
@@ -231,7 +231,7 @@
 //         >
 //           Lanjut
 //         </button>
-        
+
 //         <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
 //           <a href="#" style={{ fontSize: '14px', color: '#3498db', textDecoration: 'none' }}>
 //             Daftar
@@ -245,6 +245,7 @@
 // export default Login;
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { API_BASE_URL } from '../../config/api';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -270,7 +271,7 @@ const Login = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/login', {  // ← INI YANG BENAR
+      const response = await fetch(`${API_BASE_URL}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -126,6 +126,7 @@ import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { Calendar, MapPin, Tag, ArrowRight } from "lucide-react";
+import { API_BASE_URL } from "../config/api";
 
 export default function EventDetail() {
   const { id } = useParams();
@@ -133,14 +134,14 @@ export default function EventDetail() {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
 
-    const handleBuyTicket = () => {
+
+  const handleBuyTicket = () => {
     const token = localStorage.getItem("token");
 
     if (!token) {
       window.dispatchEvent(new Event("open-login"));
-      return; 
+      return;
     }
 
     navigate("/checkout", { state: { event } });
@@ -149,7 +150,7 @@ export default function EventDetail() {
 
   useEffect(() => {
     // Ambil detail event dari backend
-    fetch(`http://localhost:5000/events/all`, {
+    fetch(`${API_BASE_URL}/events/public`, {
       headers: { "Content-Type": "application/json" },
     })
       .then((res) => {
@@ -252,7 +253,7 @@ export default function EventDetail() {
           </div>
         </div>
       </div>
-      
+
     </>
   );
 }

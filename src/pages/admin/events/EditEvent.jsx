@@ -247,8 +247,9 @@
 // src/pages/admin/events/EditEvent.jsx
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../../../config/api";
 
-const API_BASE = "http://localhost:5000";
+const API_BASE = API_BASE_URL;
 
 export default function EditEvent() {
   const { id } = useParams();
@@ -283,7 +284,7 @@ export default function EditEvent() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
-    
+
     // ✅ PENTING: Convert number fields ke integer
     const payload = {
       nama_event: formData.get("nama_event"),
@@ -293,7 +294,7 @@ export default function EditEvent() {
       jumlah_tiket: Number(formData.get("jumlah_tiket")), // ✅ Convert ke number
       img: formData.get("img") || null,
       jenis_tiket: formData.get("jenis_tiket") || "Reguler",
-    deskripsi: formData.get("deskripsi") || "Deskripsi belum ditambahkan."
+      deskripsi: formData.get("deskripsi") || "Deskripsi belum ditambahkan."
     };
 
     console.log("📤 Payload yang dikirim:", payload); // Debug
@@ -337,7 +338,7 @@ export default function EditEvent() {
     return (
       <div className="p-8 text-center">
         <div className="text-2xl text-red-600">❌ Event tidak ditemukan</div>
-        <button 
+        <button
           onClick={() => navigate("/admin/events")}
           className="mt-4 bg-blue-600 text-white px-6 py-3 rounded-lg"
         >
@@ -352,7 +353,7 @@ export default function EditEvent() {
       <h1 className="text-4xl font-bold text-gray-800 mb-8">📝 Edit Event</h1>
 
       <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg p-8 space-y-6">
-        
+
         {/* Nama Event */}
         <div>
           <label className="block text-lg font-medium text-gray-700 mb-2">
@@ -404,7 +405,7 @@ export default function EditEvent() {
           </label>
           <input
             name="harga_tiket"
-            type="number"  
+            type="number"
             defaultValue={event.harga_tiket}
             required
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
@@ -420,7 +421,7 @@ export default function EditEvent() {
           </label>
           <input
             name="jumlah_tiket"
-            type="number"  
+            type="number"
             min="1"
             defaultValue={event.jumlah_tiket}
             required
@@ -436,7 +437,7 @@ export default function EditEvent() {
           </label>
           <input
             name="jenis_tiket"
-            type="text"  
+            type="text"
             min="1"
             defaultValue={event.jenis_tiket}
             required
@@ -467,7 +468,7 @@ export default function EditEvent() {
           </label>
           <input
             name="img"
-            type="text" 
+            type="text"
             defaultValue={event.img || ""}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
             placeholder="https://example.com/image.jpg"

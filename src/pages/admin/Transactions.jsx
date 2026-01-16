@@ -1,5 +1,6 @@
 // src/pages/admin/Transactions.jsx
 import { useState, useEffect } from "react";
+import { API_BASE_URL } from "../../config/api";
 
 export default function Transactions() {
   const [transaksi, setTransaksi] = useState([]);
@@ -7,7 +8,7 @@ export default function Transactions() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:5000/transaksi/semua", {
+    fetch(`${API_BASE_URL}/transaksi/semua`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -64,8 +65,8 @@ export default function Transactions() {
                   <p className="font-mono font-bold">{t.orderId || t.order_id || '-'}</p>
                 </div>
                 <span className={`px-3 py-1 rounded-full text-sm font-semibold ${t.status === 'paid' ? 'bg-green-100 text-green-700' :
-                    t.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                      'bg-red-100 text-red-700'
+                  t.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                    'bg-red-100 text-red-700'
                   }`}>
                   {t.status?.toUpperCase() || 'PENDING'}
                 </span>

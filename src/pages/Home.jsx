@@ -8,7 +8,7 @@
 
 //   useEffect(() => {
 //     // LOGIKA TOKEN DIHAPUS - Akses Publik
-    
+
 //     fetch("http://localhost:3000/event", {
 //       // HEADER AUTHORIZATION DIHAPUS
 //       headers: { "Content-Type": "application/json" } 
@@ -55,6 +55,7 @@
 
 import { useEffect, useState } from "react";
 import EventCard from "../components/EventCard";
+import { API_BASE_URL } from "../config/api";
 
 export default function Home() {
   const [events, setEvents] = useState([]);
@@ -63,10 +64,10 @@ export default function Home() {
 
   useEffect(() => {
     // LOGIKA TOKEN DIHAPUS - Akses Publik
-    
-    fetch("http://localhost:5000/events/all", {
+
+    fetch(`${API_BASE_URL}/events/public`, {
       // HEADER AUTHORIZATION DIHAPUS
-      headers: { "Content-Type": "application/json" } 
+      headers: { "Content-Type": "application/json" }
     })
       .then((res) => {
         // Jika server mengembalikan status 404, 500, dll.
@@ -80,7 +81,7 @@ export default function Home() {
       .catch((err) => {
         console.error(err);
         // Menampilkan pesan error fetch
-        setError(err.message); 
+        setError(err.message);
         setLoading(false);
       });
   }, []); // Dependensi array kosong agar hanya berjalan sekali

@@ -1,15 +1,16 @@
 // src/pages/admin/Tickets.jsx
 import { useState, useEffect } from "react";
+import { API_BASE_URL } from "../../config/api";
 
 export default function Tickets() {
   const [tickets, setTickets] = useState([]);
   const [events, setEvents] = useState([]);
   const token = localStorage.getItem("token");
-  const API = "http://localhost:5000";
+  const API = API_BASE_URL;
 
   const fetchData = async () => {
     const [tRes, eRes] = await Promise.all([
-      fetch(`${API}/tiket`), 
+      fetch(`${API}/tiket`),
       fetch(`${API}/events`)
     ]);
     const tData = await tRes.json();

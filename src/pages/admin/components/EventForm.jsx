@@ -1,7 +1,9 @@
 // src/pages/admin/components/EventForm.jsx
+import { API_BASE_URL } from "../../../config/api";
+
 export default function EventForm({ event, onClose, onSuccess }) {
   const token = localStorage.getItem("token");
-  const API = "http://localhost:5000";
+  const API = API_BASE_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
