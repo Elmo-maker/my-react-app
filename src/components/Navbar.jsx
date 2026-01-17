@@ -96,6 +96,7 @@ import { Link } from "react-router-dom";
 import { Search, Menu } from "lucide-react";
 import { useState, useEffect } from "react";
 import LoginModal from "./LoginModal";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -104,6 +105,8 @@ export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+
 
   // cek token di localStorage saat Navbar mount
   useEffect(() => {
@@ -153,11 +156,15 @@ export default function Navbar() {
             </button>
 
             {showSearch && (
-              <div className="absolute right-0 mt-2 bg-gray-900 border border-gray-800 rounded-lg p-2 shadow-xl">
+              <div className="absolute right-0 mt-2 z-50 bg-gray-900 border border-gray-800 rounded-lg p-2 shadow-xl">
                 <input
                   type="text"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setSearchQuery(value);
+                    navigate(`/?search=${value}`);
+                  }}
                   placeholder="Cari event..."
                   className="bg-transparent text-white text-sm outline-none w-48"
                 />
