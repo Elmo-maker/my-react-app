@@ -97,9 +97,13 @@ import { Search, Menu } from "lucide-react";
 import { useState, useEffect } from "react";
 import LoginModal from "./LoginModal";
 
+
+
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // cek token di localStorage saat Navbar mount
   useEffect(() => {
@@ -137,9 +141,31 @@ export default function Navbar() {
             <li><Link to="/contact" className="hover:text-indigo-400 transition">Contact Us</Link></li>
             <li><Link to="/faq" className="hover:text-indigo-400 transition">FAQ</Link></li>
 
-            <button className="text-gray-400 hover:text-white transition p-2">
+            {/* <button className="text-gray-400 hover:text-white transition p-2">
+              <Search size={20} />
+            </button> */}
+            <div className="relative">
+            <button
+              onClick={() => setShowSearch(!showSearch)}
+              className="text-gray-400 hover:text-white transition p-2"
+            >
               <Search size={20} />
             </button>
+
+            {showSearch && (
+              <div className="absolute right-0 mt-2 bg-gray-900 border border-gray-800 rounded-lg p-2 shadow-xl">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Cari event..."
+                  className="bg-transparent text-white text-sm outline-none w-48"
+                />
+              </div>
+            )}
+          </div>
+
+            
 
             {/* Login/Logout */}
             <li className="ml-4">
@@ -156,6 +182,7 @@ export default function Navbar() {
             <button className="text-gray-400 hover:text-white transition p-2 mr-2">
               <Search size={20} />
             </button>
+
             <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white hover:text-indigo-400 p-2">
               <Menu size={24} />
             </button>
