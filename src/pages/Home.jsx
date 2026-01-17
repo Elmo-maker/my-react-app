@@ -56,11 +56,18 @@
 import { useEffect, useState } from "react";
 import EventCard from "../components/EventCard";
 import { API_BASE_URL } from "../config/api";
+import { useLocation } from "react-router-dom";
 
 export default function Home() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { search } = useLocation();
+  const keyword = new URLSearchParams(search).get("search") || "";
+  const filteredEvents = events.filter((event) =>
+    event.nama_event.toLowerCase().includes(keyword.toLowerCase())
+  );
+
 
   useEffect(() => {
     // LOGIKA TOKEN DIHAPUS - Akses Publik
@@ -99,7 +106,7 @@ export default function Home() {
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-          {events.map((event) => (
+          {filteredEvents.map((event) => (
             // Pastikan event.id_event cocok dengan primary key dari Prisma
             <EventCard key={event.id_event} event={event} />
           ))}
@@ -108,3 +115,4 @@ export default function Home() {
     </div>
   );
 }
+//{events.map((event) => (
